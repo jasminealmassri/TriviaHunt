@@ -8,6 +8,10 @@ int main() {
 	display_header();
 	vector<MC> questions;
 
-	vector<string> responses = { "True, False" };
-	questions.push_back(MC("True or false? ", 2));
+	vector<string> responses = { "True", "False", "Maybe" };
+	questions.push_back(MC("True or false? ", responses, 0));
+
+	for(MC question : questions) {
+		question.display();
+	}
 }

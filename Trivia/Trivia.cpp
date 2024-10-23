@@ -10,6 +10,7 @@ void display_header() {
 
 void MC::display() {
 
+	std::cout << question_ << std::endl;
 	char c = 'A';
 
 	for (int i = 0; i < responses_.size(); i++) {
