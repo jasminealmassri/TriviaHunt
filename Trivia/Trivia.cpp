@@ -2,6 +2,12 @@
 
 #include "Trivia.hpp"
 
+void display_header() {
+	std::cout << "Welcome to Trivia Hunt!\n";
+	std::cout << "***********************\n\n";
+}
+
+
 void MC::display() {
 
 	char c = 'A';
