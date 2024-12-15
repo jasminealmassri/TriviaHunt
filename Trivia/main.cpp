@@ -7,11 +7,13 @@
 using namespace std;
 
 int main() {
+	
 	display_header();
-	vector<MC> questions;
+	display_instructions();
+	// display menu
 
-	//vector<string> responses = { "True", "False", "Maybe" };
-	//questions.push_back(MC("True or false? ", responses, 0));
+
+	vector<MC> questions;
 
 	// Parsing questions
 	load_questions(questions);

@@ -1,4 +1,5 @@
 #include "CSVParser.hpp"
+#include <algorithm>
 
 /*
 \ fn:		void add_question_from_csv(std::istream& is, std::vector<MC>& questions)
@@ -74,39 +75,6 @@ void load_questions(std::vector<MC>& questions) {
 }
 
 
-void ask_questions(std::vector<MC>& questions) {
-	for (MC question : questions) {
-		char answer;
-		question.display();
-		do {
-			std::cout << "\n";
-			get_valid_input(std::cin, answer, "Enter your answer: ");
-			answer = toupper(answer);
-			if (answer < 'A' || answer > 'A' + question.get_reponses().size() - 1) {
-				std::cout << "Invalid response. Please try again.\n";
-			}
 
-		} while (answer < 'A' || answer > 'A' + question.get_reponses().size() - 1);
-		// DEBUG
-		int correct_answer = question.get_correct_r() + 'A';
-		if (answer == correct_answer) {
 
-			output_colour(ConsoleColours::Green);
-			
-			std::cout << "Correct!" << std::endl;
-
-			output_colour(ConsoleColours::White);
-		}
-		else {
-			output_colour(ConsoleColours::Red);
-			
-			std::cout << "Incorrect!" << std::endl;
-			
-			output_colour(ConsoleColours::White);
-
-		}
-
-		std::cout << "\n\n";
-	}
-}
 

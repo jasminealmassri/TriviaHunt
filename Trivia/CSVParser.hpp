@@ -6,45 +6,29 @@
 #include "Trivia.hpp"
 
 
-enum ConsoleColours {
-	Black = 30
-,	Red 
-,	Green 
-,	Yellow 
-,	Blue
-,	Magenta
-,	Cyan
-,	White
-,	BrightBlack = 90
-,	BrightRed 
-,	BrightGreen 
-,	BrightYellow
-,	BrightBlue
-,	BrightMagenta
-,	BrightCyan
-,	BrightWhite
-};
 /*
-\ fn:		MC add_question_from_csv(std::string& csv_line) 
-\ brief:	Add question from a csv formatted string
-\ param:	std::string& csv_line
+\ fn:		void get_valid_input(std::istream& is, T& input_var, std::string prompt, char delimiter)
+\ brief:	Gets valid input from user - re-prompts if user input is incompatible with input variable
+\ param:	std::istream& is, T& input_var, std::string prompt, char delimiter
 */
-MC add_question_from_csv(std::string& csv_line);
+template<typename T>
+void get_valid_input(std::istream& is, T& input_var, std::string prompt, char delimiter = '\n') {
+	std::cout << prompt;
+	is >> input_var;
 
+	while (!is) {
+		std::cout << "Invalid input. Please try again." << std::endl;
+		is.clear();
+		is.ignore(std::numeric_limits<std::streamsize>::max(), delimiter);
+		//std::cout << prompt;
+		//is >> input_var;
+	}
 
-/*
-\ fn:		void load_queue(PriorityQueue<Patient>& queue)
-\ brief:	Adds to the current patient queue by loading from a CSV file provided by user
-\ param:	PriorityQueue<Patient> const& queue
-*/
-void load_questions(std::vector<MC>& questions);
-
-
-inline void output_colour(int color) {
-	std::cout << "\33[" << color << "m";
+	// return stream to good state, flush buffer
+	is.clear();
+	is.ignore(std::numeric_limits<std::streamsize>::max(), delimiter);
 }
 
 
-void ask_questions(std::vector<MC>& questions);
 
 
