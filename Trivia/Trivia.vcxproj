@@ -127,11 +127,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CSVParser.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Trivia.cpp" />
     <ClCompile Include="Utility.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CSVParser.hpp" />
     <ClInclude Include="Trivia.hpp" />
     <ClInclude Include="Utility.hpp" />
   </ItemGroup>
