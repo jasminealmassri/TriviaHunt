@@ -2,7 +2,8 @@
 
 #include <vector>
 #include <string>
-#include <algorithm>
+#include <thread>
+
 
 #include "Utility.hpp"
 #include "CSVParser.hpp"
@@ -31,14 +32,32 @@ public:
 };
 
 inline void display_header() {
-	std::cout << "Welcome to Trivia Hunt!\n";
-	std::cout << "***********************\n\n";
+	output_colour(ConsoleColours::Yellow);
+	std::cout << "*****************************************************************************************************************\n\n";
+	std::cout << "                                          Welcome to TRIVIA HUNT!\n\n";
+	std::cout << "*****************************************************************************************************************\n\n\n";
 }
 
 inline void display_instructions() {
+	output_colour(ConsoleColours::BrightYellow);
+	std::cout << "*****************************************************************************************************************\n\n";
+	std::cout << "This game will ask trivia questions and display treasure hunt hints based on the number of correct answers given.\n";
+	std::cout << "             Questions that receive an incorrect answer are shuffled and re-entered into the loop.\n\n";
+	std::cout << "                      Once enough correct answers are given, a new hint is dropped!\n";
+	std::cout << "                                          Have fun and good luck!\n\n";
+	std::cout << "*****************************************************************************************************************\n\n\n\n\n";
+}
 
-	std::cout << "This game will ask questions and display hints based on the number of correct answers given.\n";
-	std::cout << "Incorrect questions are shuffled and re-entered into the loop.\n";
+inline void get_name(std::string& name) {
+	std::cout << "Enter your name to continue....\n\n";
+	output_colour(ConsoleColours::BrightBlue);
+	std::cin >> name;
+	
+}
+
+inline void cls() {
+	std::cout << "\033[2J\033[H";
+	std::cout << "\n";
 }
 
 
@@ -63,7 +82,3 @@ void ask_questions(std::vector<MC>& questions);
 
 
 
-template<typename T>
-void shuffle(T& v) {
-	std::random_shuffle(v.begin(), v.end());
-}

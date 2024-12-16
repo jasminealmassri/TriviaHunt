@@ -1,6 +1,8 @@
 #pragma once
 
 #include <iostream>
+#include <algorithm>
+#include <random>
 
 
 enum ConsoleColours {
@@ -26,3 +28,9 @@ inline void output_colour(int color) {
 	std::cout << "\33[" << color << "m";
 }
 
+template<typename T>
+void shuffle(T& v) {
+	std::random_device rd;
+	std::mt19937 rng(rd());
+	std::shuffle(v.begin(), v.end(), rng);
+}

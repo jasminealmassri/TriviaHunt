@@ -11,7 +11,10 @@ int main() {
 	display_header();
 	display_instructions();
 	// display menu
-
+	std::string name;
+	get_name(name);
+	
+	cls();
 
 	vector<MC> questions;
 
