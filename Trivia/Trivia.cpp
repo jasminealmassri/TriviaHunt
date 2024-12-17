@@ -5,13 +5,11 @@
 
 
 void MC::display() {
+
 	output_colour(ConsoleColours::BrightCyan);
 	print_slow(question_ + "\n");
 	print_slow(std::string(question_.size(), '-'));
 	wait(50);
-	//for (int i = 0; i < question_.size(); i++) {
-	//	std::cout << "-";
-	//}
 	std::cout << "\n";
 	output_colour(ConsoleColours::White);
 	char c = 'A';
@@ -61,11 +59,6 @@ void ask_questions(std::vector<MC>& questions) {
 		}
 			wait(1500);
 			cls();
-
-		
-		//std::cout << "\n";
 	}
 
-	//std::cout << "\033[2J\033[1;1H";
-	//system("cls");
 }

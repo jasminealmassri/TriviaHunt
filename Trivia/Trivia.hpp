@@ -51,7 +51,6 @@ inline void display_header() {
 
 inline void display_instructions() {
 	output_colour(ConsoleColours::Yellow);
-	//std::cout << "*****************************************************************************************************************\n\n";
 	std::cout << "    ";
 	output_colour(ConsoleColours::BrightYellow);
 	print_slow("This game will ask trivia questions and display treasure hunt hints based on the number of right answers.\n\n");
