@@ -21,7 +21,8 @@ int main() {
 	// Parsing questions
 	load_questions(questions);
 	
+	int score{};
 	// Process questions
-	ask_questions(questions);
+	ask_questions(questions, score);
 	
 }

@@ -7,8 +7,8 @@
 void MC::display() {
 
 	output_colour(ConsoleColours::BrightCyan);
-	print_slow(question_ + "\n");
-	print_slow(std::string(question_.size(), '-'));
+	print_slow(question_ + "\n", 35);
+	print_slow(std::string(question_.size(), '-'), 2);
 	wait(50);
 	std::cout << "\n";
 	output_colour(ConsoleColours::White);
@@ -21,12 +21,13 @@ void MC::display() {
 }
 
 
-
-void ask_questions(std::vector<MC>& questions) {
+void ask_questions(std::vector<MC>& questions, int& score) {
 
 	shuffle(questions);
 
+
 	for (MC question : questions) {
+		output_score(score);
 		char answer;
 		question.display();
 		do {
@@ -49,6 +50,7 @@ void ask_questions(std::vector<MC>& questions) {
 			std::cout << "Correct!" << std::endl;
 
 			output_colour(ConsoleColours::White);
+			score += 10;
 		}
 		else {
 			output_colour(ConsoleColours::BrightRed);

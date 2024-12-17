@@ -82,8 +82,12 @@ inline void program_introduction() {
 	wait(100);
 }
 
-
-
+inline void output_score(int score) {
+	output_colour(ConsoleColours::BrightGreen);
+	std::cout << "  ------------------------";
+	std::cout << "\n  |   Your score is: " << score << "   |\n";
+	std::cout << "  ------------------------\n\n";
+}
 
 /*
 \ fn:		MC add_question_from_csv(std::string& csv_line)
@@ -102,7 +106,7 @@ void load_questions(std::vector<MC>& questions);
 
 
 
-void ask_questions(std::vector<MC>& questions);
+void ask_questions(std::vector<MC>& questions, int& score);
 
 
 
