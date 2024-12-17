@@ -31,34 +31,62 @@ public:
 	void display();
 };
 
+inline void cls() {
+	std::cout << "\033[2J\033[H";
+	std::cout << "\n";
+}
+
+inline void wait(int milliseconds) {
+	std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds));
+}
+
+inline void print_slow(std::string string, int milliseconds = 40) {
+	for (char c : string) {
+		std::cout << c;
+		wait(milliseconds);
+	}
+}
+
 inline void display_header() {
 	output_colour(ConsoleColours::Yellow);
-	std::cout << "*****************************************************************************************************************\n\n";
-	std::cout << "                                          Welcome to TRIVIA HUNT!\n\n";
-	std::cout << "*****************************************************************************************************************\n\n\n";
+	print_slow("*****************************************************************************************************************\n\n", 5);
+	output_colour(ConsoleColours::BrightYellow);
+	wait(500);
+	//std::cout << "                                          Welcome to TRIVIA HUNT!\n\n";
+	std::cout << "                                          ";
+	print_slow("Welcome to TRIVIA HUNT!\n\n");
+	output_colour(ConsoleColours::Yellow);
+	print_slow("*****************************************************************************************************************\n\n", 5);
 }
 
 inline void display_instructions() {
+	output_colour(ConsoleColours::Yellow);
+	//std::cout << "*****************************************************************************************************************\n\n";
+	std::cout << "    ";
 	output_colour(ConsoleColours::BrightYellow);
-	std::cout << "*****************************************************************************************************************\n\n";
-	std::cout << "This game will ask trivia questions and display treasure hunt hints based on the number of correct answers given.\n";
-	std::cout << "             Questions that receive an incorrect answer are shuffled and re-entered into the loop.\n\n";
-	std::cout << "                      Once enough correct answers are given, a new hint is dropped!\n";
-	std::cout << "                                          Have fun and good luck!\n\n";
-	std::cout << "*****************************************************************************************************************\n\n\n\n\n";
+	print_slow("This game will ask trivia questions and display treasure hunt hints based on the number of right answers.\n\n");
+	wait(500);
+	std::cout << "                      ";
+	print_slow("Once enough correct answers are given, a new hint is dropped!\n\n");
+	wait(500);
+	std::cout << "             ";
+	print_slow("Questions that receive an incorrect answer are shuffled and re-entered into the loop.\n\n");
+	std::cout << "                                          ";
+	wait(500);
+	print_slow("Have fun and good luck!\n\n");
+	output_colour(ConsoleColours::Yellow);
+	print_slow("*****************************************************************************************************************\n\n\n\n\n", 5);
 }
 
 inline void get_name(std::string& name) {
-	std::cout << "Enter your name to continue....\n\n";
+	output_colour(ConsoleColours::BrightYellow);
+	print_slow("Enter your name to continue....\n\n");
 	output_colour(ConsoleColours::BrightBlue);
 	std::cin >> name;
 	
 }
 
-inline void cls() {
-	std::cout << "\033[2J\033[H";
-	std::cout << "\n";
-}
+
 
 
 /*

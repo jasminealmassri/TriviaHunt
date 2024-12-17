@@ -53,11 +53,11 @@ void ask_questions(std::vector<MC>& questions) {
 			std::cout << "Incorrect!" << std::endl;
 
 			output_colour(ConsoleColours::White);
-
 		}
+			wait(1500);
+			cls();
 
-		std::this_thread::sleep_for(std::chrono::milliseconds(1500));
-		cls();
+		
 		//std::cout << "\n";
 	}
 

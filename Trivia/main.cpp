@@ -9,8 +9,9 @@ using namespace std;
 int main() {
 	
 	display_header();
+	wait(1500);
 	display_instructions();
-	// display menu
+	wait(100);
 	std::string name;
 	get_name(name);
 	
