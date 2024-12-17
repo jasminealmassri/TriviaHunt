@@ -8,14 +8,13 @@ using namespace std;
 
 int main() {
 	
-	display_header();
-	wait(1500);
-	display_instructions();
-	wait(100);
-	std::string name;
+
+	// Uncomment when ready
+	//program_introduction();
+
+	/*std::string name;
 	get_name(name);
-	
-	cls();
+	cls();*/
 
 	vector<MC> questions;
 

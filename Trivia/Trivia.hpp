@@ -2,7 +2,7 @@
 
 #include <vector>
 #include <string>
-#include <thread>
+
 
 
 #include "Utility.hpp"
@@ -29,23 +29,13 @@ public:
 	std::vector<std::string> get_reponses() const { return responses_; }
 
 	void display();
+
+	bool invalid_answer(char answer) {
+		return answer < 'A' || answer > 'A' + responses_.size() - 1;
+	}
 };
 
-inline void cls() {
-	std::cout << "\033[2J\033[H";
-	std::cout << "\n";
-}
 
-inline void wait(int milliseconds) {
-	std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds));
-}
-
-inline void print_slow(std::string string, int milliseconds = 40) {
-	for (char c : string) {
-		std::cout << c;
-		wait(milliseconds);
-	}
-}
 
 inline void display_header() {
 	output_colour(ConsoleColours::Yellow);
@@ -84,6 +74,13 @@ inline void get_name(std::string& name) {
 	output_colour(ConsoleColours::BrightBlue);
 	std::cin >> name;
 	
+}
+
+inline void program_introduction() {
+	display_header();
+	wait(1500);
+	display_instructions();
+	wait(100);
 }
 
 
