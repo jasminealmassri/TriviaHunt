@@ -82,7 +82,7 @@ inline void program_introduction() {
 	wait(100);
 }
 
-inline void output_score(int score, int max_score, int hints_received, int max_hints) {
+inline void display_score(int score, int max_score, int hints_received, int max_hints) {
 	output_colour(ConsoleColours::BrightYellow);
 	std::cout << "  --------------------------------";
 	std::cout << "\n  |    Your score is: " << score << " / " << max_score << "    |\n";
