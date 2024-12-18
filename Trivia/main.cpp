@@ -21,6 +21,6 @@ int main() {
 	
 	int score{};
 	// Process questions
-	ask_questions(questions, score);
+	ask_questions(questions, score, hints);
 	
 }

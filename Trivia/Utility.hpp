@@ -38,7 +38,7 @@ void shuffle(T& v) {
 
 inline void cls() {
 	std::cout << "\033[2J\033[H";
-	std::cout << "\n";
+	//std::cout << "\n";
 }
 
 inline void wait(int milliseconds) {

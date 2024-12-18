@@ -79,13 +79,15 @@ void load_questions(std::vector<MC>& questions) {
 }
 
 
-void ask_questions(std::vector<MC>& questions, int& score) {
+void ask_questions(std::vector<MC>& questions, int& score, std::vector<std::string> hints) {
 
 	shuffle(questions);
-
+	const int num_hints_max = hints.size();
+	const int hints_received{};
+	const int PTS_PER_Q = 10;
 
 	for (MC question : questions) {
-		output_score(score);
+		output_score(score, questions.size() * PTS_PER_Q, hints_received, num_hints_max);
 		char answer;
 		question.display();
 		do {
@@ -108,7 +110,7 @@ void ask_questions(std::vector<MC>& questions, int& score) {
 			std::cout << "Correct!" << std::endl;
 
 			output_colour(ConsoleColours::White);
-			score += 10;
+			score += PTS_PER_Q;
 		}
 		else {
 			output_colour(ConsoleColours::BrightRed);

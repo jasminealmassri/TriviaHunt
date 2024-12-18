@@ -82,11 +82,14 @@ inline void program_introduction() {
 	wait(100);
 }
 
-inline void output_score(int score) {
-	output_colour(ConsoleColours::BrightGreen);
-	std::cout << "  ------------------------";
-	std::cout << "\n  |   Your score is: " << score << "   |\n";
-	std::cout << "  ------------------------\n\n";
+inline void output_score(int score, int max_score, int hints_received, int max_hints) {
+	output_colour(ConsoleColours::BrightYellow);
+	std::cout << "  --------------------------------";
+	std::cout << "\n  |    Your score is: " << score << " / " << max_score << "    |\n";
+	std::cout << "  --------------------------------\n\n";
+
+	std::cout << "  Number of hints left to get: " << max_hints - hints_received <<"\n\n";
+
 }
 
 /*
@@ -111,7 +114,7 @@ void load_questions(std::vector<MC>& questions);
 */
 void load_hints(std::vector<std::string>& hints);
 
-void ask_questions(std::vector<MC>& questions, int& score);
+void ask_questions(std::vector<MC>& questions, int& score, std::vector<std::string> hints);
 
 
 
