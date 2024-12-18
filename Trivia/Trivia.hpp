@@ -104,7 +104,12 @@ MC add_question_from_csv(std::string& csv_line);
 */
 void load_questions(std::vector<MC>& questions);
 
-
+/*
+\ fn:		void load_queue(PriorityQueue<Patient>& queue)
+\ brief:	Adds to the current patient queue by loading from a CSV file provided by user
+\ param:	PriorityQueue<Patient> const& queue
+*/
+void load_hints(std::vector<std::string>& hints);
 
 void ask_questions(std::vector<MC>& questions, int& score);
 

@@ -9,17 +9,15 @@ using namespace std;
 int main() {
 	
 
-	// Uncomment when ready
-	//program_introduction();
-
-	/*std::string name;
-	get_name(name);
-	cls();*/
-
-	vector<MC> questions;
-
 	// Parsing questions
+	vector<MC> questions;
 	load_questions(questions);
+	shuffle(questions);
+
+	// Parsing hints
+	vector<string> hints;
+	load_hints(hints);
+	shuffle(hints);
 	
 	int score{};
 	// Process questions

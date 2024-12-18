@@ -41,38 +41,7 @@ MC add_question_from_csv(std::string& csv_line) {
 
 }
 
-/*
-\ fn:		void load_queue(PriorityQueue<Patient>& queue)
-\ brief:	Adds to the current patient queue by loading from a CSV file provided by user
-\ param:	PriorityQueue<Patient> const& queue
-*/
-void load_questions(std::vector<MC>& questions) {
 
-	// get filepath from user
-	//std::string file_path;
-	//std::cout << "Enter path to file: ";
-	//getline(std::cin, file_path);
-
-	std::string file_path("../Trivia.csv");
-
-	std::ifstream file_stream;
-	file_stream.open(file_path);
-
-	// If file could not be opened, notify user and exit
-	if (!file_stream) {
-		std::cerr << "Error: could not open file path: \"" << file_path << "\".\n";
-		file_stream.close();
-		return;
-	}
-	std::string line;
-
-	//get header (get rid of header line)
-	getline(file_stream, line);
-	// iterate over file, adding each line as a patient to the queue
-	while (getline(file_stream, line)) {
-		questions.push_back(add_question_from_csv(line));
-	}
-}
 
 
 
