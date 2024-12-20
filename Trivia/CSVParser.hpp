@@ -20,8 +20,6 @@ void get_valid_input(std::istream& is, T& input_var, std::string prompt, char de
 		std::cout << "Invalid input. Please try again." << std::endl;
 		is.clear();
 		is.ignore(std::numeric_limits<std::streamsize>::max(), delimiter);
-		//std::cout << prompt;
-		//is >> input_var;
 	}
 
 	// return stream to good state, flush buffer

@@ -5,8 +5,11 @@
 void MC::display() {
 
 	output_colour(ConsoleColours::BrightCyan);
+	
 	print_slow(question_ + "\n", 35);
 	print_slow(std::string(question_.size(), '-'), 2);
+	//std::cout << question_ << std::endl << std::endl;
+
 	wait(50);
 	std::cout << "\n";
 	output_colour(ConsoleColours::White);
@@ -58,13 +61,8 @@ MC add_question_from_csv(std::string& csv_line) {
 
 }
 
-/*
-\ fn:		void load_hints(std::vector<std::string>& hints)
-\ brief:	Loads the hints from hints.csv
-\ param:	PriorityQueue<Patient> const& queue
-*/
-void load_hints(std::vector<std::string>& hints) {
-	std::string file_path("../Hints.csv");
+
+void load_clues(std::queue<Clue_t>& clues, std::string file_path) {
 
 	std::ifstream file_stream;
 	file_stream.open(file_path);
@@ -81,7 +79,7 @@ void load_hints(std::vector<std::string>& hints) {
 	getline(file_stream, line);
 	// iterate over file, adding each line as a patient to the queue
 	while (getline(file_stream, line)) {
-		hints.push_back(line);
+		clues.push(line);
 	}
 }
 
@@ -90,14 +88,12 @@ void load_hints(std::vector<std::string>& hints) {
 \ brief:	Adds to the current patient queue by loading from a CSV file provided by user
 \ param:	PriorityQueue<Patient> const& queue
 */
-void load_questions(std::vector<MC>& questions) {
+void load_questions(std::vector<MC>& questions, std::string file_path) {
 
 	// get filepath from user
 	//std::string file_path;
 	//std::cout << "Enter path to file: ";
 	//getline(std::cin, file_path);
-
-	std::string file_path("../Trivia.csv");
 
 	std::ifstream file_stream;
 	file_stream.open(file_path);
@@ -119,48 +115,68 @@ void load_questions(std::vector<MC>& questions) {
 }
 
 
-void ask_questions(std::vector<MC>& questions, int& score, std::vector<std::string> hints) {
+void ask_questions(std::vector<MC>& questions, int& score, std::queue<Clue_t>& clues) {
 
 	shuffle(questions);
-	const int num_hints_max = hints.size();
-	const int hints_received{};
-	const int PTS_PER_Q = 10;
+	const int NUM_QUESTIONS = questions.size();
+	const int NUM_CLUES = clues.size();
+	
+	int clues_received{};
 
-	for (MC question : questions) {
-		display_score(score, questions.size() * PTS_PER_Q, hints_received, num_hints_max);
+	const int PTS_PER_Q = 10;
+	const int CLUE_THRESHOLD{ 5 * PTS_PER_Q };
+	int next_clue_threshold{ CLUE_THRESHOLD };
+
+	while(!questions.empty()) {
+
+		display_score(score, NUM_QUESTIONS * PTS_PER_Q, clues_received, NUM_CLUES);
+		
 		char answer;
-		question.display();
+		questions[0].display();
+		
 		do {
 			std::cout << "\n";
 			get_valid_input(std::cin, answer, "Enter your answer: ");
 			answer = toupper(answer);
 
-			if (question.invalid_answer(answer)) {
+			if (questions[0].invalid_answer(answer)) {
 				std::cout << "Invalid response. Please try again.\n";
 			}
 
-		} while (question.invalid_answer(answer));
+		} while (questions[0].invalid_answer(answer));
 		// DEBUG
-		int correct_answer = question.get_correct_r() + 'A';
+		int correct_answer = questions[0].get_correct_r() + 'A';
 		
 		if (answer == correct_answer) {
 
 			output_colour(ConsoleColours::BrightGreen);
 
-			std::cout << "Correct!" << std::endl;
+			std::cout << "\nCorrect!" << std::endl;
 
 			output_colour(ConsoleColours::White);
 			score += PTS_PER_Q;
+
+			questions.erase(std::find(questions.begin(), questions.end(), questions[0]));
+
+			if (score == next_clue_threshold) {
+				display_clue(clues.front());
+				clues.pop();
+				clues_received++;
+				next_clue_threshold += CLUE_THRESHOLD;
+			}
 		}
 		else {
 			output_colour(ConsoleColours::BrightRed);
 
-			std::cout << "Incorrect!" << std::endl;
+			std::cout << "\nIncorrect!" << std::endl;
 
 			output_colour(ConsoleColours::White);
+
+			shuffle(questions);
 		}
-			wait(1500);
-			cls();
+
+		wait(1500);
+		cls();
 	}
 
 }
