@@ -5,36 +5,38 @@
 #include <queue>
 
 
-
 #include "Utility.hpp"
 #include "CSVParser.hpp"
 
 using Clue_t = std::string;
 
 
-
+/*
+*	class:		MC
+*	purpose:	Represents a multiple choice question
+*/
 class MC {
 	std::string question_;
-	std::vector<std::string> responses_;
+	std::vector<std::string> options_;
 	unsigned correct_response_;
 public:
 	MC(
 		  std::string question = ""
-		, std::vector<std::string> responses = {"True", "False"}
+		, std::vector<std::string> options = {"True", "False"}
 		, unsigned correct_response = 1
 	) 
 		: question_(question)
-		, responses_(responses)
+		, options_(options)
 		, correct_response_(correct_response) 
 	{}
 
 	unsigned get_correct_r() const { return correct_response_; }
-	std::vector<std::string> get_reponses() const { return responses_; }
+	std::vector<std::string> get_options() const { return options_; }
 
 	void display();
 
 	bool invalid_answer(char answer) {
-		return answer < 'A' || answer > 'A' + responses_.size() - 1;
+		return answer < 'A' || answer > 'A' + options_.size() - 1;
 	}
 
 	bool operator == (MC const& other) {

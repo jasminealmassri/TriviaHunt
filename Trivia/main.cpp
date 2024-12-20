@@ -7,15 +7,23 @@
 
 using namespace std;
 
+#define TESTING
+
 int main() {
 	
 
 	const string questions_filepath("../Trivia.csv");
 	const string clues_filepath("../Clues.csv");
 
-	program_introduction();
+	const string savepoint_questions_filepath("../TriviaSavepoint.csv");
+	const string clues_filepath("../CluesSavepoint.csv");
 
-	// get name
+#ifdef TESTING
+#else
+	program_introduction();
+#endif
+
+	 // get name
 	std::string name;
 	get_name(name);
 	cls();
@@ -29,8 +37,8 @@ int main() {
 	queue<string> clues;
 	load_clues(clues, clues_filepath);
 	
-	int score{};
 	// Process questions
+	int score{};
 	ask_questions(questions, score, clues);
 
 	display_victory(name);
