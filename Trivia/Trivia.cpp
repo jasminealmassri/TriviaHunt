@@ -6,17 +6,20 @@ void MC::display() {
 
 	output_colour(ConsoleColours::BrightCyan);
 	
+#ifdef TESTING
 	print_slow(question_ + "\n", 35);
 	print_slow(std::string(question_.size(), '-'), 2);
-	//std::cout << question_ << std::endl << std::endl;
+#else
+	std::cout << question_ << std::endl << std::endl;
+#endif
 
 	wait(50);
 	std::cout << "\n";
 	output_colour(ConsoleColours::White);
 	char c = 'A';
 
-	for (int i = 0; i < responses_.size(); i++) {
-		std::cout << c++ << ". " << responses_[i] << std::endl;
+	for (int i = 0; i < options_.size(); i++) {
+		std::cout << c++ << ". " << options_[i] << std::endl;
 	}
 
 }
@@ -117,14 +120,12 @@ void load_questions(std::vector<MC>& questions, std::string file_path) {
 
 void ask_questions(std::vector<MC>& questions, int& score, std::queue<Clue_t>& clues) {
 
-	shuffle(questions);
 	const int NUM_QUESTIONS = questions.size();
 	const int NUM_CLUES = clues.size();
 	
-	int clues_received{};
-
 	const int PTS_PER_Q = 10;
 	const int CLUE_THRESHOLD{ 5 * PTS_PER_Q };
+	int clues_received{};
 	int next_clue_threshold{ CLUE_THRESHOLD };
 
 	while(!questions.empty()) {
@@ -134,9 +135,9 @@ void ask_questions(std::vector<MC>& questions, int& score, std::queue<Clue_t>& c
 		char answer;
 		questions[0].display();
 		
+		// get valid answer from user
 		do {
-			std::cout << "\n";
-			get_valid_input(std::cin, answer, "Enter your answer: ");
+			get_valid_input(std::cin, answer, "\nEnter your answer: ");
 			answer = toupper(answer);
 
 			if (questions[0].invalid_answer(answer)) {
@@ -144,7 +145,7 @@ void ask_questions(std::vector<MC>& questions, int& score, std::queue<Clue_t>& c
 			}
 
 		} while (questions[0].invalid_answer(answer));
-		// DEBUG
+
 		int correct_answer = questions[0].get_correct_r() + 'A';
 		
 		if (answer == correct_answer) {
@@ -154,18 +155,28 @@ void ask_questions(std::vector<MC>& questions, int& score, std::queue<Clue_t>& c
 			std::cout << "\nCorrect!" << std::endl;
 
 			output_colour(ConsoleColours::White);
+
 			score += PTS_PER_Q;
 
 			questions.erase(std::find(questions.begin(), questions.end(), questions[0]));
 
 			if (score == next_clue_threshold) {
+
 				display_clue(clues.front());
 				clues.pop();
+				
+				// quit if all clues are received
+				if (clues.empty()) {
+					break;
+				}
+
 				clues_received++;
 				next_clue_threshold += CLUE_THRESHOLD;
 			}
+			
 		}
 		else {
+
 			output_colour(ConsoleColours::BrightRed);
 
 			std::cout << "\nIncorrect!" << std::endl;
