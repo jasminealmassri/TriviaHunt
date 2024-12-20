@@ -24,6 +24,37 @@ void MC::display() {
 
 }
 
+void load_state(std::string state_save_filepath, GameState& state) {
+
+	if (!std::filesystem::exists(state_save_filepath)) {
+		return;
+	}
+
+	std::ifstream file(state_save_filepath);
+
+	if (!file.is_open()) {
+		std::cout << "Error: Could not open state file.\n";
+		return;
+	}
+
+	std::string line;
+	// header
+	getline(file, line);
+
+	getline(file, line);
+	std::istringstream ss(line);
+
+
+	getline(ss, state.player_name, ',');
+	get_valid_input(ss, state.current_score, "", ',');
+	get_valid_input(ss, state.PTS_PER_Q, "", ',');
+	get_valid_input(ss, state.CLUE_THRESHOLD, "", ',');
+	get_valid_input(ss, state.max_score, "", ',');
+	get_valid_input(ss, state.clues_received, "", ',');
+	get_valid_input(ss, state.next_clue_threshold, "", ',');
+
+}
+
 /*
 \ fn:		void add_question_from_csv(std::istream& is, std::vector<MC>& questions)
 \ brief:	Add question from a csv formatted input
@@ -118,19 +149,23 @@ void load_questions(std::vector<MC>& questions, std::string file_path) {
 }
 
 
-void ask_questions(std::vector<MC>& questions, int& score, std::queue<Clue_t>& clues) {
+void ask_questions(std::vector<MC>& questions, std::queue<Clue_t>& clues, GameState& state, std::string questions_savepoint_filepath, std::string clues_savepoint_filepath, std::string state_save_filepath) {
 
 	const int NUM_QUESTIONS = questions.size();
 	const int NUM_CLUES = clues.size();
 	
-	const int PTS_PER_Q = 10;
-	const int CLUE_THRESHOLD{ 5 * PTS_PER_Q };
-	int clues_received{};
-	int next_clue_threshold{ CLUE_THRESHOLD };
+	load_state(state_save_filepath, state);
+	//const int PTS_PER_Q = 10;
+	//const int CLUE_THRESHOLD{ 5 * PTS_PER_Q };
+	//int clues_received{};
+	//int next_clue_threshold{ CLUE_THRESHOLD };
+
+	//std::ofstream questions_save_file;
+	std::ofstream clues_save_file;
 
 	while(!questions.empty()) {
 
-		display_score(score, NUM_QUESTIONS * PTS_PER_Q, clues_received, NUM_CLUES);
+		display_score(state.current_score, state.max_score, state.clues_received, NUM_CLUES);
 		
 		char answer;
 		questions[0].display();
@@ -146,7 +181,7 @@ void ask_questions(std::vector<MC>& questions, int& score, std::queue<Clue_t>& c
 
 		} while (questions[0].invalid_answer(answer));
 
-		int correct_answer = questions[0].get_correct_r() + 'A';
+		int correct_answer = questions[0].correct_response() + 'A';
 		
 		if (answer == correct_answer) {
 
@@ -156,11 +191,15 @@ void ask_questions(std::vector<MC>& questions, int& score, std::queue<Clue_t>& c
 
 			output_colour(ConsoleColours::White);
 
-			score += PTS_PER_Q;
+			state.current_score += state.PTS_PER_Q;
 
 			questions.erase(std::find(questions.begin(), questions.end(), questions[0]));
 
-			if (score == next_clue_threshold) {
+		
+			save_questions(questions_savepoint_filepath, questions);
+			
+
+			if (state.current_score == state.next_clue_threshold) {
 
 				display_clue(clues.front());
 				clues.pop();
@@ -170,9 +209,11 @@ void ask_questions(std::vector<MC>& questions, int& score, std::queue<Clue_t>& c
 					break;
 				}
 
-				clues_received++;
-				next_clue_threshold += CLUE_THRESHOLD;
+				state.clues_received++;
+				state.next_clue_threshold += state.CLUE_THRESHOLD;
 			}
+
+			save_state(state_save_filepath, state);
 			
 		}
 		else {

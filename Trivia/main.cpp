@@ -1,5 +1,8 @@
 #include <iostream>
 #include <queue>
+#include <filesystem>
+
+#include <fstream>
 
 #include "Trivia.hpp"
 #include "Utility.hpp"
@@ -11,26 +14,43 @@ using namespace std;
 
 int main() {
 	
+	GameState state;
 
-	const string questions_filepath("../Trivia.csv");
-	const string clues_filepath("../Clues.csv");
+	const string questions_original_filepath("../Trivia.csv");
+	const string questions_savepoint_filepath("../TriviaSavepoint.csv");
 
-	const string savepoint_questions_filepath("../TriviaSavepoint.csv");
-	const string clues_filepath("../CluesSavepoint.csv");
+	const string clues_original_filepath("../Clues.csv");
+	const string clues_savepoint_filepath("../CluesSavepoint.csv");
+	const string state_savepoint_filepath("../StateSavepoint.csv");
+
+	string questions_filepath{ questions_original_filepath};
+	string clues_filepath{ clues_original_filepath };
+
+	bool continue_from_savepoint{};
 
 #ifdef TESTING
 #else
 	program_introduction();
 #endif
 
-	 // get name
-	std::string name;
-	get_name(name);
+	if (std::filesystem::exists(questions_savepoint_filepath)) {
+		continue_from_savepoint = continue_savepoint();
+		if (continue_from_savepoint) {
+			questions_filepath = questions_savepoint_filepath;
+			clues_filepath = clues_savepoint_filepath;
+		}
+	}
+
+	// get name
+	get_name(state.player_name);
 	cls();
 
 	// Parsing trivia questions
 	vector<MC> questions;
 	load_questions(questions, questions_filepath);
+	if (!continue_from_savepoint) {
+		state.max_score = questions.size() * state.PTS_PER_Q;
+	}
 	shuffle(questions);
 
 	// Parsing clues
@@ -38,9 +58,8 @@ int main() {
 	load_clues(clues, clues_filepath);
 	
 	// Process questions
-	int score{};
-	ask_questions(questions, score, clues);
+	ask_questions(questions, clues, state, questions_savepoint_filepath, clues_savepoint_filepath, state_savepoint_filepath);
 
-	display_victory(name);
+	display_victory(state.player_name);
 	
 }

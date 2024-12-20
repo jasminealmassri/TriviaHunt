@@ -3,14 +3,23 @@
 #include <vector>
 #include <string>
 #include <queue>
-
+#include <fstream>
+#include <filesystem>
 
 #include "Utility.hpp"
 #include "CSVParser.hpp"
 
 using Clue_t = std::string;
 
-
+struct GameState {
+	std::string player_name{};
+	int current_score{};
+	int PTS_PER_Q{ 10 };
+	int CLUE_THRESHOLD{ 5 * PTS_PER_Q };
+	int max_score{};
+	int clues_received{};
+	int next_clue_threshold{ CLUE_THRESHOLD };
+};
 /*
 *	class:		MC
 *	purpose:	Represents a multiple choice question
@@ -30,8 +39,9 @@ public:
 		, correct_response_(correct_response) 
 	{}
 
-	unsigned get_correct_r() const { return correct_response_; }
-	std::vector<std::string> get_options() const { return options_; }
+	std::string question() const { return question_;  }
+	unsigned correct_response() const { return correct_response_; }
+	std::vector<std::string> options() const { return options_; }
 
 	void display();
 
@@ -43,6 +53,18 @@ public:
 		return question_ == other.question_;
 	}
 };
+
+inline bool continue_savepoint() {
+	
+	char answer{};
+
+	do {
+		get_valid_input(std::cin, answer, "Resume previous progress? (y/n): ");
+		answer = toupper(answer);
+	} while (answer != 'Y' && answer != 'N');
+
+	return answer == 'Y';
+}
 
 
 
@@ -83,6 +105,7 @@ inline void get_name(std::string& name) {
 	print_slow("Enter your name to continue....\n\n");
 	output_colour(ConsoleColours::BrightBlue);
 	std::cin >> name;
+	output_colour(ConsoleColours::BrightYellow);
 	
 }
 
@@ -148,7 +171,7 @@ void load_questions(std::vector<MC>& questions, std::string file_path);
 */
 void load_clues(std::queue<Clue_t>& clues, std::string file_path);
 
-void ask_questions(std::vector<MC>& questions, int& score, std::queue<Clue_t>& clues);
+void ask_questions(std::vector<MC>& questions, std::queue<Clue_t>& clues, GameState& state, std::string questions_savepoint_filepath, std::string clues_savepoint_filepath, std::string state_save_filepath);
 
 inline void display_victory(std::string name) {
 	cls();
@@ -168,6 +191,57 @@ inline void display_victory(std::string name) {
 	output_colour(ConsoleColours::Red);
 	print_slow("   *******************************************************\n", 5);
 	output_colour(ConsoleColours::Black);
+}
+
+void load_state(std::string state_save_filepath, GameState& state);
+
+inline void save_state(std::string state_save_filepath, GameState const& state) {
+
+	std::ofstream file(state_save_filepath);
+
+	if (!file.is_open()) {
+		std::cout << "Error: Could not save questions to file.\n";
+		return;
+	}
+
+	file << "Player Name,Current Score,Points Per Question,Clue Threshold,Max Score,Num Clues Received,Next Clue Threshold\n";
+
+	file
+		<< state.player_name << ","
+		<< state.current_score << ","
+		<< state.PTS_PER_Q << ","
+		<< state.CLUE_THRESHOLD << ","
+		<< state.max_score << ","
+		<< state.clues_received << ","
+		<< state.next_clue_threshold << ","
+		<< "\n";
+}
+
+inline void save_questions(std::string questions_savepoint_filepath, std::vector<MC> const& questions) {
+
+	std::ofstream file(questions_savepoint_filepath);
+
+	if (!file.is_open()) {
+		std::cout << "Error: Could not save questions to file.\n";
+		return;
+	}
+
+	file << "Trivia Questions,Correct Answer,Num Responses,Responses\n";
+
+	for (MC const& question : questions) {
+
+		auto options = question.options();
+
+		file
+			<< question.question() << ","
+			<< question.correct_response() << ","
+			<< options.size() << ",";
+
+		for (auto option : options) {
+			file << option << ",";
+		}
+		file << "\n";
+	}
 }
 
 
