@@ -17,6 +17,7 @@ struct GameState {
 	int PTS_PER_Q{ 10 };
 	int CLUE_THRESHOLD{ 5 * PTS_PER_Q };
 	int max_score{};
+	int max_clues{};
 	int clues_received{};
 	int next_clue_threshold{ CLUE_THRESHOLD };
 };
@@ -204,7 +205,7 @@ inline void save_state(std::string state_save_filepath, GameState const& state) 
 		return;
 	}
 
-	file << "Player Name,Current Score,Points Per Question,Clue Threshold,Max Score,Num Clues Received,Next Clue Threshold\n";
+	file << "Player Name,Current Score,Points Per Question,Clue Threshold,Max Score,Max Clues,Num Clues Received,Next Clue Threshold\n";
 
 	file
 		<< state.player_name << ","
@@ -212,6 +213,7 @@ inline void save_state(std::string state_save_filepath, GameState const& state) 
 		<< state.PTS_PER_Q << ","
 		<< state.CLUE_THRESHOLD << ","
 		<< state.max_score << ","
+		<< state.max_clues << ","
 		<< state.clues_received << ","
 		<< state.next_clue_threshold << ","
 		<< "\n";
@@ -234,13 +236,31 @@ inline void save_questions(std::string questions_savepoint_filepath, std::vector
 
 		file
 			<< question.question() << ","
-			<< question.correct_response() << ","
+			<< question.correct_response() + 1<< ","
 			<< options.size() << ",";
 
 		for (auto option : options) {
 			file << option << ",";
 		}
 		file << "\n";
+	}
+}
+
+inline void save_clues(std::string clues_savepoint_filepath, std::queue<Clue_t> const& clues) {
+
+	std::ofstream file(clues_savepoint_filepath);
+
+	if (!file.is_open()) {
+		std::cout << "Error: Could not save clues to file.\n";
+		return;
+	}
+
+	file << "Clue\n";
+	std::queue<Clue_t> clues_copy(clues);
+	while (!clues_copy.empty()) {
+
+		file << clues_copy.front() << "\n";
+		clues_copy.pop();
 	}
 }
 

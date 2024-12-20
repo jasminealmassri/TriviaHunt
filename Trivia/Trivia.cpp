@@ -50,6 +50,7 @@ void load_state(std::string state_save_filepath, GameState& state) {
 	get_valid_input(ss, state.PTS_PER_Q, "", ',');
 	get_valid_input(ss, state.CLUE_THRESHOLD, "", ',');
 	get_valid_input(ss, state.max_score, "", ',');
+	get_valid_input(ss, state.max_clues, "", ',');
 	get_valid_input(ss, state.clues_received, "", ',');
 	get_valid_input(ss, state.next_clue_threshold, "", ',');
 
@@ -154,7 +155,7 @@ void ask_questions(std::vector<MC>& questions, std::queue<Clue_t>& clues, GameSt
 	const int NUM_QUESTIONS = questions.size();
 	const int NUM_CLUES = clues.size();
 	
-	load_state(state_save_filepath, state);
+	//load_state(state_save_filepath, state);
 	//const int PTS_PER_Q = 10;
 	//const int CLUE_THRESHOLD{ 5 * PTS_PER_Q };
 	//int clues_received{};
@@ -165,7 +166,7 @@ void ask_questions(std::vector<MC>& questions, std::queue<Clue_t>& clues, GameSt
 
 	while(!questions.empty()) {
 
-		display_score(state.current_score, state.max_score, state.clues_received, NUM_CLUES);
+		display_score(state.current_score, state.max_score, state.clues_received, state.max_clues);
 		
 		char answer;
 		questions[0].display();
@@ -211,6 +212,7 @@ void ask_questions(std::vector<MC>& questions, std::queue<Clue_t>& clues, GameSt
 
 				state.clues_received++;
 				state.next_clue_threshold += state.CLUE_THRESHOLD;
+				save_clues(clues_savepoint_filepath, clues);
 			}
 
 			save_state(state_save_filepath, state);
@@ -230,5 +232,9 @@ void ask_questions(std::vector<MC>& questions, std::queue<Clue_t>& clues, GameSt
 		wait(1500);
 		cls();
 	}
+
+	std::filesystem::remove(clues_savepoint_filepath);
+	std::filesystem::remove(state_save_filepath);
+	std::filesystem::remove(questions_savepoint_filepath);
 
 }

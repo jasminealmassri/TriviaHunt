@@ -14,7 +14,7 @@ using namespace std;
 
 int main() {
 	
-	GameState state;
+	GameState state{};
 
 	const string questions_original_filepath("../Trivia.csv");
 	const string questions_savepoint_filepath("../TriviaSavepoint.csv");
@@ -36,27 +36,31 @@ int main() {
 	if (std::filesystem::exists(questions_savepoint_filepath)) {
 		continue_from_savepoint = continue_savepoint();
 		if (continue_from_savepoint) {
+			load_state(state_savepoint_filepath, state);
 			questions_filepath = questions_savepoint_filepath;
 			clues_filepath = clues_savepoint_filepath;
 		}
 	}
 
 	// get name
-	get_name(state.player_name);
-	cls();
+	if (!continue_from_savepoint) {
+		get_name(state.player_name);
+		cls();
+	}
 
 	// Parsing trivia questions
 	vector<MC> questions;
 	load_questions(questions, questions_filepath);
-	if (!continue_from_savepoint) {
-		state.max_score = questions.size() * state.PTS_PER_Q;
-	}
 	shuffle(questions);
 
 	// Parsing clues
 	queue<string> clues;
 	load_clues(clues, clues_filepath);
 	
+	if (!continue_from_savepoint) {
+		state.max_score = questions.size() * state.PTS_PER_Q;
+		state.max_clues = clues.size();
+	}
 	// Process questions
 	ask_questions(questions, clues, state, questions_savepoint_filepath, clues_savepoint_filepath, state_savepoint_filepath);
 

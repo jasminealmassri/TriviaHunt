@@ -15,6 +15,8 @@ It will also parse treasure hunt clues from a CSV file with each line containing
 
 When a question is answered incorrectly it is re-shuffled into the queue. The game ends when all questions are answered correctly or all clues are given.
 
+This program will save progress for an unfinished game. If the program is closed it will give an option to start from last progress.
+
 ### <ins>Technical details:</ins>
 
 Language: C++<br/>
@@ -29,7 +31,7 @@ Tools: Visual Studio 2022
 
 ### <ins>Learning outcomes:</ins>
 
+- Best learning experience on this project was learning to make persistance state from scratch. It was a good thought exercise on saving and loading state at its most basic form.
 - I made code readability a priority by abstracting code into named functions and replacing all magic numbers with enums and variables.
 - I focused on separation of concerns in each file, class and method.
 - I made several new utility functions for CSV parsing, changing console font colour and printing text at various speeds
-- I optimized to make game progress persistant in the csv files so that if it's accidentaly closed the user doesn't lose their progress. Original data is still retained if a restart is required.
