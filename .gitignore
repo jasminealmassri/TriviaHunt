@@ -366,3 +366,5 @@ FodyWeavers.xsd
 /New Microsoft Excel Worksheet.xlsx
 /TESTTrivia.csv
 /TestClues.csv
+/TriviaSavepoint.csv
+/StateSavepoint.csv
