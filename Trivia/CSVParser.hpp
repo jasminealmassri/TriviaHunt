@@ -1,3 +1,10 @@
+/*
+*	File:		CSVParser.hpp
+*	Purpose:	Generic functions for parsing CSV
+*	Author:		Jasmine Al Massri
+*	Date:		Dec 21 2024
+*/
+
 #pragma once
 
 #include <sstream>

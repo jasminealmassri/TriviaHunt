@@ -1,3 +1,11 @@
+/*
+*	File:		Trivia.hpp
+*	Purpose:	Functions and methods for Trivia Hunt program
+*	Author:		Jasmine Al Massri
+*	Date:		Dec 21 2024
+*/
+
+
 #pragma once
 
 #include <vector>
@@ -16,10 +24,12 @@ using Clue_t = std::string;
 *	purpose:	Represents a multiple choice trivia question
 */
 class MC {
+	// Members
 	std::string question_;
 	std::vector<std::string> options_;
 	unsigned correct_response_;
 public:
+	// Constructor
 	MC(
 		  std::string question = ""
 		, std::vector<std::string> options = {"True", "False"}
@@ -30,13 +40,16 @@ public:
 		, correct_response_(correct_response) 
 	{}
 
+	// Getters
 	std::string question() const { return question_;  }
 	unsigned correct_response() const { return correct_response_; }
 	char correct_response_char() const { return correct_response_ + 'A'; }
 	std::vector<std::string> options() const { return options_; }
 
+	// Displays a question
 	void display();
 
+	// Validates an answer, returns true for invalid
 	bool invalid_answer(char answer) {
 		return answer < 'A' || answer > 'A' + options_.size() - 1;
 	}
@@ -46,11 +59,25 @@ public:
 	}
 };
 
-/*
-*   fn:			MC add_question_from_csv(std::string& csv_line)
-*   purpose:	Add question from a csv formatted string
-*/
 MC get_question_from_csv(std::string& csv_line);
+
+
+inline void display_clue(Clue_t clue) {
+	output_colour(ConsoleColours::BrightGreen);
+	std::cout << "\nNew treasure clue unlocked!!\n";
+	wait(1000);
+
+	wait(1000);
+	print_slow("\nYour clue is: \"" + clue + "\"", 60);
+	wait(1000);
+	std::cout << "\n";
+	output_colour(ConsoleColours::BrightYellow);
+	char c = 'z';
+	while (toupper(c) != 'Y') {
+		std::cout << "Enter Y to continue when you're done with this clue: ";
+		std::cin >> c;
+	}
+}
 
 /*
 *	struct:		GameState
@@ -60,12 +87,12 @@ struct GameState {
 
 	std::string player_name{};
 	int current_score{};
-	int PTS_PER_Q{ 10 };
-	int CLUE_THRESHOLD{ 5 * PTS_PER_Q };
+	int pts_per_q{ 10 };
+	int clue_threshold{ 5 * pts_per_q };
 	int max_score{};
 	int max_clues{};
 	int clues_received{};
-	int next_clue_threshold{ CLUE_THRESHOLD };
+	int next_clue_threshold{ clue_threshold };
 
 	std::string questions_filepath{};
 	std::string clues_filepath{};
@@ -100,8 +127,8 @@ struct GameState {
 		file
 			<< player_name << ","
 			<< current_score << ","
-			<< PTS_PER_Q << ","
-			<< CLUE_THRESHOLD << ","
+			<< pts_per_q << ","
+			<< clue_threshold << ","
 			<< max_score << ","
 			<< max_clues << ","
 			<< clues_received << ","
@@ -131,8 +158,8 @@ struct GameState {
 
 		getline(ss, player_name, ',');
 		get_valid_input(ss, current_score, "", ',');
-		get_valid_input(ss, PTS_PER_Q, "", ',');
-		get_valid_input(ss, CLUE_THRESHOLD, "", ',');
+		get_valid_input(ss, pts_per_q, "", ',');
+		get_valid_input(ss, clue_threshold, "", ',');
 		get_valid_input(ss, max_score, "", ',');
 		get_valid_input(ss, max_clues, "", ',');
 		get_valid_input(ss, clues_received, "", ',');
@@ -158,11 +185,6 @@ struct GameState {
 			questions.push_back(get_question_from_csv(line));
 		}
 	}
-
-	void shuffle_questions() {
-		shuffle(questions);
-	}
-
 	void save_questions() {
 
 		std::ofstream file(questions_save_path);
@@ -188,6 +210,9 @@ struct GameState {
 			}
 			file << "\n";
 		}
+	}
+	void shuffle_questions() {
+		shuffle(questions);
 	}
 
 	void load_clues() {
@@ -227,6 +252,42 @@ struct GameState {
 		}
 	}
 	
+	void handle_correct_response(MC question) {
+
+		output_colour(ConsoleColours::BrightGreen);
+		std::cout << "\nCorrect!" << std::endl;
+		output_colour(ConsoleColours::White);
+
+		current_score += pts_per_q;
+
+		questions.erase(std::find(questions.begin(), questions.end(), question));
+
+		save_questions();
+		save_clues();
+
+		if (current_score == next_clue_threshold) {
+
+			display_clue(clues.front());
+			clues.pop();
+
+			save_clues();
+			clues_received++;
+			next_clue_threshold += clue_threshold;
+		}
+
+		save_state();
+	}
+	void handle_incorrect_response() {
+
+		output_colour(ConsoleColours::BrightRed);
+
+		std::cout << "\nIncorrect!" << std::endl;
+
+		output_colour(ConsoleColours::White);
+
+		shuffle_questions();
+	}
+
 	void remove_save_files() {
 		std::filesystem::remove(questions_save_path);
 		std::filesystem::remove(clues_save_path);
@@ -280,6 +341,13 @@ inline void display_instructions() {
 	print_slow("*****************************************************************************************************************\n\n\n\n\n", 5);
 }
 
+inline void program_introduction() {
+	display_header();
+	wait(1500);
+	display_instructions();
+	wait(100);
+}
+
 inline void get_name(std::string& name) {
 	output_colour(ConsoleColours::BrightYellow);
 	print_slow("Enter your name to continue....\n\n");
@@ -289,29 +357,6 @@ inline void get_name(std::string& name) {
 	
 }
 
-inline void program_introduction() {
-	display_header();
-	wait(1500);
-	display_instructions();
-	wait(100);
-}
-
-inline void display_clue(Clue_t clue) {
-	output_colour(ConsoleColours::BrightGreen);
-	std::cout << "\nNew treasure clue unlocked!!\n";
-	wait(1000);
-	
-	wait(1000);
-	print_slow("\nYour clue is: \"" + clue + "\"", 60);
-	wait(1000);
-	std::cout << "\n";
-	output_colour(ConsoleColours::BrightYellow);
-	char c = 'z';
-	while (toupper(c) != 'Y') {
-		std::cout << "Enter Y to continue when you're done with this clue: ";
-		std::cin >> c;
-	}
-}
 
 inline void display_victory(std::string name) {
 	cls();
@@ -350,43 +395,6 @@ inline int ask_question(MC question) {
 	} while (question.invalid_answer(answer));
 
 	return answer;
-}
-
-inline void handle_correct_response(MC current_question, GameState& state) {
-
-	output_colour(ConsoleColours::BrightGreen);
-	std::cout << "\nCorrect!" << std::endl;
-	output_colour(ConsoleColours::White);
-
-	state.current_score += state.PTS_PER_Q;
-
-	state.questions.erase(std::find(state.questions.begin(), state.questions.end(), current_question));
-
-	state.save_questions();
-	state.save_clues();
-
-	if (state.current_score == state.next_clue_threshold) {
-
-		display_clue(state.clues.front());
-		state.clues.pop();
-
-		state.save_clues();
-		state.clues_received++;
-		state.next_clue_threshold += state.CLUE_THRESHOLD;
-	}
-
-	state.save_state();
-}
-
-inline void handle_incorrect_response(GameState& state) {
-	
-	output_colour(ConsoleColours::BrightRed);
-
-	std::cout << "\nIncorrect!" << std::endl;
-
-	output_colour(ConsoleColours::White);
-
-	state.shuffle_questions();
 }
 
 void ask_questions(GameState& state);

@@ -1,3 +1,10 @@
+/*
+*	File:		Trivia.cpp
+*	Purpose:	Implementations of functions and methods for Trivia Hunt program
+*	Author:		Jasmine Al Massri
+*	Date:		Dec 21 2024
+*/
+
 #include <iostream>
 #include "Utility.hpp"
 #include "Trivia.hpp"
@@ -7,10 +14,10 @@ void MC::display() {
 	output_colour(ConsoleColours::BrightCyan);
 	
 #ifdef TESTING
+	std::cout << question_ << std::endl << std::endl;
+#else
 	print_slow(question_ + "\n", 35);
 	print_slow(std::string(question_.size(), '-'), 2);
-#else
-	std::cout << question_ << std::endl << std::endl;
 #endif
 
 	wait(50);
@@ -24,12 +31,6 @@ void MC::display() {
 
 }
 
- 
-/*
-\ fn:		void add_question_from_csv(std::istream& is, std::vector<MC>& questions)
-\ brief:	Gets question from a csv formatted input
-\ param:	std::istream& is, std::vector<MC>& questions
-*/
 MC get_question_from_csv(std::string& csv_line) {
 
 	std::istringstream ss(csv_line);
@@ -65,7 +66,6 @@ MC get_question_from_csv(std::string& csv_line) {
 
 }
 
-
 void ask_questions(GameState& state) {
 
 	while(!state.questions.empty() && !state.clues.empty()) {
@@ -78,7 +78,9 @@ void ask_questions(GameState& state) {
 
 		char correct_answer = current_question.correct_response_char();
 		
-		answer == correct_answer ? handle_correct_response(current_question, state) : handle_incorrect_response(state);
+		answer == correct_answer ? 
+			state.handle_correct_response(current_question) 
+		:	state.handle_incorrect_response();
 		
 		wait(1500);
 		cls();

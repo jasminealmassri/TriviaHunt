@@ -1,3 +1,10 @@
+/*
+*	File:		Utility.hpp
+*	Purpose:	General purpose functions 
+*	Author:		Jasmine Al Massri
+*	Date:		Dec 21 2024
+*/
+
 #pragma once
 
 #include <iostream>
@@ -25,10 +32,6 @@ enum ConsoleColours {
 	, BrightWhite
 };
 
-inline void output_colour(int color) {
-	std::cout << "\33[" << color << "m";
-}
-
 template<typename T>
 void shuffle(T& v) {
 	std::random_device rd;
@@ -36,9 +39,12 @@ void shuffle(T& v) {
 	std::shuffle(v.begin(), v.end(), rng);
 }
 
+inline void output_colour(int color) {
+	std::cout << "\33[" << color << "m";
+}
+
 inline void cls() {
 	std::cout << "\033[2J\033[H";
-	//std::cout << "\n";
 }
 
 inline void wait(int milliseconds) {
