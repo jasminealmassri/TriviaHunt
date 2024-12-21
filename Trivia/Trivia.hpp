@@ -77,6 +77,15 @@ struct GameState {
 	std::vector<MC> questions{};
 	std::queue<Clue_t> clues{};
 
+	void display_score() {
+		output_colour(ConsoleColours::BrightYellow);
+		std::cout << "  --------------------------------";
+		std::cout << "\n  |    Your score is: " << current_score << " / " << max_score << "    |\n";
+		std::cout << "  --------------------------------\n\n";
+
+		std::cout << "  Number of clues left to get: " << max_clues - clues_received << "\n\n";
+	}
+
 	void save_state() const {
 
 		std::ofstream file(state_save_path);
@@ -130,7 +139,6 @@ struct GameState {
 		get_valid_input(ss, next_clue_threshold, "", ',');
 	}
 	
-
 	void load_questions() {
 		std::ifstream file_stream;
 		file_stream.open(questions_filepath);
@@ -150,6 +158,11 @@ struct GameState {
 			questions.push_back(get_question_from_csv(line));
 		}
 	}
+
+	void shuffle_questions() {
+		shuffle(questions);
+	}
+
 	void save_questions() {
 
 		std::ofstream file(questions_save_path);
@@ -281,21 +294,6 @@ inline void program_introduction() {
 	wait(100);
 }
 
-/*
-\ fn:		inline void display_score(int score, int max_score, int clues_received, int max_clues) 
-\ brief:	Displays the current score
-\ param:	int score, int max_score, int clues_received, int max_clues
-*/
-inline void display_score(int score, int max_score, int clues_received, int max_clues) {
-	output_colour(ConsoleColours::BrightYellow);
-	std::cout << "  --------------------------------";
-	std::cout << "\n  |    Your score is: " << score << " / " << max_score << "    |\n";
-	std::cout << "  --------------------------------\n\n";
-
-	std::cout << "  Number of clues left to get: " << max_clues - clues_received <<"\n\n";
-
-}
-
 inline void display_clue(Clue_t clue) {
 	output_colour(ConsoleColours::BrightGreen);
 	std::cout << "\nNew treasure clue unlocked!!\n";
@@ -333,7 +331,6 @@ inline void display_victory(std::string name) {
 	print_slow("   *******************************************************\n", 5);
 	output_colour(ConsoleColours::Black);
 }
-
 
 inline int ask_question(MC question) {
 	
@@ -389,15 +386,8 @@ inline void handle_incorrect_response(GameState& state) {
 
 	output_colour(ConsoleColours::White);
 
-	shuffle(state.questions);
+	state.shuffle_questions();
 }
-
-/*
-\ fn:		void load_clues(std::queue<Clue_t>& clues, std::string file_path);
-\ brief:	Loads treasure hunt clues from given filepath
-\ param:	std::queue<Clue_t>& clues, std::string file_path
-*/
-//void load_clues(std::queue<Clue_t>& clues, std::string file_path);
 
 void ask_questions(GameState& state);
 

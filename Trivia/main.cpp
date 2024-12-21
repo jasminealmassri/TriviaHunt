@@ -16,15 +16,11 @@ int main() {
 	
 	GameState state{};
 
-	//const string questions_original_filepath("../Trivia.csv");
 	state.clues_filepath = "../Clues.csv";
 	state.questions_filepath = "../Trivia.csv";
 	state.questions_save_path = "../QuestionsSave.csv";
 	state.clues_save_path = "../CluesSave.csv";
 	state.state_save_path = "../StateSave.csv";
-
-	//string questions_filepath{ questions_original_filepath};
-	//string clues_filepath{ clues_original_filepath };
 
 	bool continue_from_savepoint{};
 
@@ -50,24 +46,24 @@ int main() {
 	}
 	cls();
 
-	// Parsing trivia questions
-	//vector<MC> questions;
+	// Load questions and clues
 	state.load_questions();
-	shuffle(state.questions);
-
-	// Parsing clues
-	//queue<string> clues;
+	state.shuffle_questions();
 	state.load_clues();
 	
+	// Set initial numbers for max score and clues
 	if (!continue_from_savepoint) {
 		state.max_score = state.questions.size() * state.PTS_PER_Q;
 		state.max_clues = state.clues.size();
 	}
+
 	// Process questions
 	ask_questions(state);
 
+	// Game finished, save no longer needed
 	state.remove_save_files();
 
+	// Victory
 	display_victory(state.player_name);
 	
 }

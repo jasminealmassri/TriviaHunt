@@ -66,34 +66,11 @@ MC get_question_from_csv(std::string& csv_line) {
 }
 
 
-//void load_clues(std::queue<Clue_t>& clues, std::string file_path) {
-//
-//	std::ifstream file_stream;
-//	file_stream.open(file_path);
-//
-//	// If file could not be opened, notify user and exit
-//	if (!file_stream) {
-//		std::cerr << "Error: could not open file path: \"" << file_path << "\".\n";
-//		file_stream.close();
-//		return;
-//	}
-//	std::string line;
-//
-//	//get header (get rid of header line)
-//	getline(file_stream, line);
-//	// iterate over file, adding each line as a patient to the queue
-//	while (getline(file_stream, line)) {
-//		clues.push(line);
-//	}
-//}
-
-
 void ask_questions(GameState& state) {
-
 
 	while(!state.questions.empty() || !state.clues.empty()) {
 
-		display_score(state.current_score, state.max_score, state.clues_received, state.max_clues);
+		state.display_score();
 		
 		MC current_question = state.questions[0];
 
@@ -101,9 +78,7 @@ void ask_questions(GameState& state) {
 
 		char correct_answer = current_question.correct_response_char();
 		
-		answer == correct_answer ? 
-			handle_correct_response(current_question, state)
-		:	handle_incorrect_response(state);
+		answer == correct_answer ? handle_correct_response(current_question, state) : handle_incorrect_response(state);
 		
 		wait(1500);
 		cls();
