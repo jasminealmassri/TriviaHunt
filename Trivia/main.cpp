@@ -16,14 +16,14 @@ int main() {
 	
 	GameState state{};
 
-	const string questions_original_filepath("../Trivia.csv");
-	const string questions_savepoint_filepath("../TriviaSavepoint.csv");
-
+	//const string questions_original_filepath("../Trivia.csv");
 	const string clues_original_filepath("../Clues.csv");
-	const string clues_savepoint_filepath("../CluesSavepoint.csv");
-	const string state_savepoint_filepath("../StateSavepoint.csv");
+	state.questions_filepath = "../Trivia.csv";
+	state.questions_save_path = "../QuestionsSave.csv";
+	state.clues_save_path = "../CluesSave.csv";
+	state.state_save_path = "../StateSave.csv";
 
-	string questions_filepath{ questions_original_filepath};
+	//string questions_filepath{ questions_original_filepath};
 	string clues_filepath{ clues_original_filepath };
 
 	bool continue_from_savepoint{};
@@ -33,12 +33,14 @@ int main() {
 	program_introduction();
 #endif
 
-	if (std::filesystem::exists(questions_savepoint_filepath)) {
-		continue_from_savepoint = continue_savepoint();
+	if (std::filesystem::exists(state.questions_save_path)) {
+
+		continue_from_savepoint = continue_from_save();
+		
 		if (continue_from_savepoint) {
-			load_state(state_savepoint_filepath, state);
-			questions_filepath = questions_savepoint_filepath;
-			clues_filepath = clues_savepoint_filepath;
+			state.load_state();
+			state.questions_filepath = state.questions_save_path;
+			clues_filepath = state.clues_save_path;
 		}
 	}
 
@@ -49,20 +51,20 @@ int main() {
 	cls();
 
 	// Parsing trivia questions
-	vector<MC> questions;
-	load_questions(questions, questions_filepath);
-	shuffle(questions);
+	//vector<MC> questions;
+	state.load_questions();
+	shuffle(state.questions);
 
 	// Parsing clues
 	queue<string> clues;
 	load_clues(clues, clues_filepath);
 	
 	if (!continue_from_savepoint) {
-		state.max_score = questions.size() * state.PTS_PER_Q;
+		state.max_score = state.questions.size() * state.PTS_PER_Q;
 		state.max_clues = clues.size();
 	}
 	// Process questions
-	ask_questions(questions, clues, state, questions_savepoint_filepath, clues_savepoint_filepath, state_savepoint_filepath);
+	ask_questions(clues, state);
 
 	display_victory(state.player_name);
 	

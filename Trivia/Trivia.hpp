@@ -11,24 +11,10 @@
 
 using Clue_t = std::string;
 
-/*
-*	class:		GameState
-*	purpose:	Represents game state
-*/
-struct GameState {
-	std::string player_name{};
-	int current_score{};
-	int PTS_PER_Q{ 10 };
-	int CLUE_THRESHOLD{ 5 * PTS_PER_Q };
-	int max_score{};
-	int max_clues{};
-	int clues_received{};
-	int next_clue_threshold{ CLUE_THRESHOLD };
-};
 
 /*
 *	class:		MC
-*	purpose:	Represents a multiple choice question
+*	purpose:	Represents a multiple choice trivia question
 */
 class MC {
 	std::string question_;
@@ -60,7 +46,145 @@ public:
 	}
 };
 
-inline bool continue_savepoint() {
+/*
+\ fn:		MC add_question_from_csv(std::string& csv_line)
+\ brief:	Add question from a csv formatted string
+\ param:	std::string& csv_line
+*/
+MC add_question_from_csv(std::string& csv_line);
+
+
+/*
+*	struct:		GameState
+*	purpose:	Holds state, saving, loading methods
+*/
+struct GameState {
+
+	std::string player_name{};
+	int current_score{};
+	int PTS_PER_Q{ 10 };
+	int CLUE_THRESHOLD{ 5 * PTS_PER_Q };
+	int max_score{};
+	int max_clues{};
+	int clues_received{};
+	int next_clue_threshold{ CLUE_THRESHOLD };
+
+	std::string questions_filepath{};
+	std::string clues_filepath{};
+
+	std::string questions_save_path{};
+	std::string clues_save_path{};
+	std::string state_save_path{};
+
+	std::vector<MC> questions{};
+	std::queue<MC> clues{};
+
+	void save_state() const {
+
+		std::ofstream file(state_save_path);
+
+		if (!file.is_open()) {
+			std::cout << "Error: Could not save questions to file.\n";
+			return;
+		}
+
+		file << "Player Name,Current Score,Points Per Question,Clue Threshold,Max Score,Max Clues,Num Clues Received,Next Clue Threshold\n";
+
+		file
+			<< player_name << ","
+			<< current_score << ","
+			<< PTS_PER_Q << ","
+			<< CLUE_THRESHOLD << ","
+			<< max_score << ","
+			<< max_clues << ","
+			<< clues_received << ","
+			<< next_clue_threshold << ","
+			<< "\n";
+	}
+	void load_state() {
+
+		if (!std::filesystem::exists(state_save_path)) {
+			return;
+		}
+
+		std::ifstream file(state_save_path);
+
+		if (!file.is_open()) {
+			std::cout << "Error: Could not open state save file.\n";
+			return;
+		}
+
+		std::string line;
+		// header
+		getline(file, line);
+
+		getline(file, line);
+		std::istringstream ss(line);
+
+
+		getline(ss, player_name, ',');
+		get_valid_input(ss, current_score, "", ',');
+		get_valid_input(ss, PTS_PER_Q, "", ',');
+		get_valid_input(ss, CLUE_THRESHOLD, "", ',');
+		get_valid_input(ss, max_score, "", ',');
+		get_valid_input(ss, max_clues, "", ',');
+		get_valid_input(ss, clues_received, "", ',');
+		get_valid_input(ss, next_clue_threshold, "", ',');
+	}
+	void remove_save_files() {
+		std::filesystem::remove(questions_save_path);
+		std::filesystem::remove(clues_save_path);
+		std::filesystem::remove(state_save_path);
+	}
+
+	void load_questions() {
+		std::ifstream file_stream;
+		file_stream.open(questions_filepath);
+
+		// If file could not be opened, notify user and exit
+		if (!file_stream) {
+			std::cerr << "Error: could not open file path: \"" << questions_filepath << "\".\n";
+			file_stream.close();
+			return;
+		}
+		std::string line;
+
+		//get header (get rid of header line)
+		getline(file_stream, line);
+		// iterate over file, adding each line as a patient to the queue
+		while (getline(file_stream, line)) {
+			questions.push_back(add_question_from_csv(line));
+		}
+	}
+	void save_questions() {
+
+		std::ofstream file(questions_save_path);
+
+		if (!file.is_open()) {
+			std::cout << "Error: Could not save questions to file.\n";
+			return;
+		}
+
+		file << "Trivia Questions,Correct Answer,Num Responses,Responses\n";
+
+		for (MC const& question : questions) {
+
+			auto options = question.options();
+
+			file
+				<< question.question() << ","
+				<< question.correct_response() + 1 << ","
+				<< options.size() << ",";
+
+			for (auto option : options) {
+				file << option << ",";
+			}
+			file << "\n";
+		}
+	}
+};
+
+inline bool continue_from_save() {
 	
 	char answer{};
 
@@ -154,21 +278,7 @@ inline void display_clue(Clue_t clue) {
 	}
 }
 
-/*
-\ fn:		MC add_question_from_csv(std::string& csv_line)
-\ brief:	Add question from a csv formatted string
-\ param:	std::string& csv_line
-*/
-MC add_question_from_csv(std::string& csv_line);
 
-
-
-/*
-\ fn:		void load_questions(std::vector<MC>& questions, std::string file_path);
-\ brief:	Loads questions from given filepath
-\ param:	std::vector<MC>& questions, std::string file_path
-*/
-void load_questions(std::vector<MC>& questions, std::string file_path);
 
 /*
 \ fn:		void load_clues(std::queue<Clue_t>& clues, std::string file_path);
@@ -177,7 +287,7 @@ void load_questions(std::vector<MC>& questions, std::string file_path);
 */
 void load_clues(std::queue<Clue_t>& clues, std::string file_path);
 
-void ask_questions(std::vector<MC>& questions, std::queue<Clue_t>& clues, GameState& state, std::string questions_savepoint_filepath, std::string clues_savepoint_filepath, std::string state_save_filepath);
+void ask_questions(std::queue<Clue_t>& clues, GameState& state);
 
 inline void display_victory(std::string name) {
 	cls();
@@ -199,57 +309,9 @@ inline void display_victory(std::string name) {
 	output_colour(ConsoleColours::Black);
 }
 
-void load_state(std::string state_save_filepath, GameState& state);
+//void load_state(std::string state_save_filepath, GameState& state);
 
-inline void save_state(std::string state_save_filepath, GameState const& state) {
 
-	std::ofstream file(state_save_filepath);
-
-	if (!file.is_open()) {
-		std::cout << "Error: Could not save questions to file.\n";
-		return;
-	}
-
-	file << "Player Name,Current Score,Points Per Question,Clue Threshold,Max Score,Max Clues,Num Clues Received,Next Clue Threshold\n";
-
-	file
-		<< state.player_name << ","
-		<< state.current_score << ","
-		<< state.PTS_PER_Q << ","
-		<< state.CLUE_THRESHOLD << ","
-		<< state.max_score << ","
-		<< state.max_clues << ","
-		<< state.clues_received << ","
-		<< state.next_clue_threshold << ","
-		<< "\n";
-}
-
-inline void save_questions(std::string questions_savepoint_filepath, std::vector<MC> const& questions) {
-
-	std::ofstream file(questions_savepoint_filepath);
-
-	if (!file.is_open()) {
-		std::cout << "Error: Could not save questions to file.\n";
-		return;
-	}
-
-	file << "Trivia Questions,Correct Answer,Num Responses,Responses\n";
-
-	for (MC const& question : questions) {
-
-		auto options = question.options();
-
-		file
-			<< question.question() << ","
-			<< question.correct_response() + 1<< ","
-			<< options.size() << ",";
-
-		for (auto option : options) {
-			file << option << ",";
-		}
-		file << "\n";
-	}
-}
 
 inline void save_clues(std::string clues_savepoint_filepath, std::queue<Clue_t> const& clues) {
 
@@ -268,6 +330,7 @@ inline void save_clues(std::string clues_savepoint_filepath, std::queue<Clue_t> 
 		clues_copy.pop();
 	}
 }
+
 
 
 

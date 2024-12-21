@@ -361,19 +361,5 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
-/Trivia.csv
-/Clues.csv
 /New Microsoft Excel Worksheet.xlsx
-/TESTTrivia.csv
-/TestClues.csv
-/TriviaSavepoint.csv
-/StateSavepoint.csv
-/CluesSavepoint.csv
-/Empty.csv
-/Empty2.csv
-/TestClues.csv
-/TestClues2.csv
-/TestCluesHeaders.csv
-/TestTrivia7.csv
-/TestTriviaHeaders.csv
-/TriviaAllA.csv
+*.csv

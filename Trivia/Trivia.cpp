@@ -24,37 +24,7 @@ void MC::display() {
 
 }
 
-void load_state(std::string state_save_filepath, GameState& state) {
 
-	if (!std::filesystem::exists(state_save_filepath)) {
-		return;
-	}
-
-	std::ifstream file(state_save_filepath);
-
-	if (!file.is_open()) {
-		std::cout << "Error: Could not open state file.\n";
-		return;
-	}
-
-	std::string line;
-	// header
-	getline(file, line);
-
-	getline(file, line);
-	std::istringstream ss(line);
-
-
-	getline(ss, state.player_name, ',');
-	get_valid_input(ss, state.current_score, "", ',');
-	get_valid_input(ss, state.PTS_PER_Q, "", ',');
-	get_valid_input(ss, state.CLUE_THRESHOLD, "", ',');
-	get_valid_input(ss, state.max_score, "", ',');
-	get_valid_input(ss, state.max_clues, "", ',');
-	get_valid_input(ss, state.clues_received, "", ',');
-	get_valid_input(ss, state.next_clue_threshold, "", ',');
-
-}
 
 /*
 \ fn:		void add_question_from_csv(std::istream& is, std::vector<MC>& questions)
@@ -123,66 +93,55 @@ void load_clues(std::queue<Clue_t>& clues, std::string file_path) {
 \ brief:	Adds to the current patient queue by loading from a CSV file provided by user
 \ param:	PriorityQueue<Patient> const& queue
 */
-void load_questions(std::vector<MC>& questions, std::string file_path) {
+//void load_questions(std::vector<MC>& questions, std::string file_path) {
+//
+//	// get filepath from user
+//	//std::string file_path;
+//	//std::cout << "Enter path to file: ";
+//	//getline(std::cin, file_path);
+//
+//	std::ifstream file_stream;
+//	file_stream.open(file_path);
+//
+//	// If file could not be opened, notify user and exit
+//	if (!file_stream) {
+//		std::cerr << "Error: could not open file path: \"" << file_path << "\".\n";
+//		file_stream.close();
+//		return;
+//	}
+//	std::string line;
+//
+//	//get header (get rid of header line)
+//	getline(file_stream, line);
+//	// iterate over file, adding each line as a patient to the queue
+//	while (getline(file_stream, line)) {
+//		questions.push_back(add_question_from_csv(line));
+//	}
+//}
 
-	// get filepath from user
-	//std::string file_path;
-	//std::cout << "Enter path to file: ";
-	//getline(std::cin, file_path);
 
-	std::ifstream file_stream;
-	file_stream.open(file_path);
-
-	// If file could not be opened, notify user and exit
-	if (!file_stream) {
-		std::cerr << "Error: could not open file path: \"" << file_path << "\".\n";
-		file_stream.close();
-		return;
-	}
-	std::string line;
-
-	//get header (get rid of header line)
-	getline(file_stream, line);
-	// iterate over file, adding each line as a patient to the queue
-	while (getline(file_stream, line)) {
-		questions.push_back(add_question_from_csv(line));
-	}
-}
+void ask_questions(std::queue<Clue_t>& clues, GameState& state) {
 
 
-void ask_questions(std::vector<MC>& questions, std::queue<Clue_t>& clues, GameState& state, std::string questions_savepoint_filepath, std::string clues_savepoint_filepath, std::string state_save_filepath) {
-
-	//const int NUM_QUESTIONS = questions.size();
-	//const int NUM_CLUES = clues.size();
-	
-	//load_state(state_save_filepath, state);
-	//const int PTS_PER_Q = 10;
-	//const int CLUE_THRESHOLD{ 5 * PTS_PER_Q };
-	//int clues_received{};
-	//int next_clue_threshold{ CLUE_THRESHOLD };
-
-	//std::ofstream questions_save_file;
-	std::ofstream clues_save_file;
-
-	while(!questions.empty()) {
+	while(!state.questions.empty()) {
 
 		display_score(state.current_score, state.max_score, state.clues_received, state.max_clues);
 		
 		char answer;
-		questions[0].display();
+		state.questions[0].display();
 		
 		// get valid answer from user
 		do {
 			get_valid_input(std::cin, answer, "\nEnter your answer: ");
 			answer = toupper(answer);
 
-			if (questions[0].invalid_answer(answer)) {
+			if (state.questions[0].invalid_answer(answer)) {
 				std::cout << "Invalid response. Please try again.\n";
 			}
 
-		} while (questions[0].invalid_answer(answer));
+		} while (state.questions[0].invalid_answer(answer));
 
-		int correct_answer = questions[0].correct_response() + 'A';
+		int correct_answer = state.questions[0].correct_response() + 'A';
 		
 		if (answer == correct_answer) {
 
@@ -192,11 +151,11 @@ void ask_questions(std::vector<MC>& questions, std::queue<Clue_t>& clues, GameSt
 
 			state.current_score += state.PTS_PER_Q;
 
-			questions.erase(std::find(questions.begin(), questions.end(), questions[0]));
+			state.questions.erase(std::find(state.questions.begin(), state.questions.end(), state.questions[0]));
 
-			save_questions(questions_savepoint_filepath, questions);
+			state.save_questions();
 
-			save_clues(clues_savepoint_filepath, clues);
+			save_clues(state.clues_save_path, clues);
 
 			if (state.current_score == state.next_clue_threshold) {
 
@@ -208,12 +167,12 @@ void ask_questions(std::vector<MC>& questions, std::queue<Clue_t>& clues, GameSt
 					break;
 				}
 
-				save_clues(clues_savepoint_filepath, clues);
+				save_clues(state.clues_save_path, clues);
 				state.clues_received++;
 				state.next_clue_threshold += state.CLUE_THRESHOLD;
 			}
 		
-			save_state(state_save_filepath, state);
+			state.save_state();
 			
 		}
 		else {
@@ -224,15 +183,13 @@ void ask_questions(std::vector<MC>& questions, std::queue<Clue_t>& clues, GameSt
 
 			output_colour(ConsoleColours::White);
 
-			shuffle(questions);
+			shuffle(state.questions);
 		}
 
 		wait(1500);
 		cls();
 	}
 
-	std::filesystem::remove(clues_savepoint_filepath);
-	std::filesystem::remove(state_save_filepath);
-	std::filesystem::remove(questions_savepoint_filepath);
+	state.remove_save_files();
 
 }
