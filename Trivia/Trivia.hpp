@@ -239,10 +239,12 @@ inline bool continue_from_save() {
 	char answer{};
 
 	do {
-		get_valid_input(std::cin, answer, "Resume previous progress? (y/n): ");
+		get_valid_input(std::cin, answer, "\nResume previous progress? (y/n): ");
 		answer = toupper(answer);
 	} while (answer != 'Y' && answer != 'N');
 
+	std::cout << "\n\n";
+	
 	return answer == 'Y';
 }
 
@@ -311,7 +313,6 @@ inline void display_clue(Clue_t clue) {
 	}
 }
 
-
 inline void display_victory(std::string name) {
 	cls();
 	std::cout << "\n\n";
@@ -350,7 +351,6 @@ inline int ask_question(MC question) {
 
 	return answer;
 }
-
 
 inline void handle_correct_response(MC current_question, GameState& state) {
 

@@ -68,7 +68,7 @@ MC get_question_from_csv(std::string& csv_line) {
 
 void ask_questions(GameState& state) {
 
-	while(!state.questions.empty() || !state.clues.empty()) {
+	while(!state.questions.empty() && !state.clues.empty()) {
 
 		state.display_score();
 		

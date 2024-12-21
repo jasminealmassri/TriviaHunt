@@ -362,4 +362,3 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /New Microsoft Excel Worksheet.xlsx
-*.csv

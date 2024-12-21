@@ -16,32 +16,37 @@ int main() {
 	
 	GameState state{};
 
-	state.clues_filepath = "../Clues.csv";
-	state.questions_filepath = "../Trivia.csv";
-	state.questions_save_path = "../QuestionsSave.csv";
-	state.clues_save_path = "../CluesSave.csv";
-	state.state_save_path = "../StateSave.csv";
+	// File paths 
+	std::string rootpath = "../Files";
+
+	state.questions_filepath =	rootpath + "/Questions.csv";
+	state.clues_filepath =		rootpath + "/Clues.csv";
+
+	state.questions_save_path = rootpath + "/QuestionsSave.csv";
+	state.clues_save_path =		rootpath + "/CluesSave.csv";
+	state.state_save_path =		rootpath + "/StateSave.csv";
 
 	bool continue_from_savepoint{};
 
-#ifdef TESTING
-#else
-	program_introduction();
-#endif
-
+	// If save files exist, ask if user wants to continue from save and handle choice
 	if (std::filesystem::exists(state.questions_save_path)) {
 
 		continue_from_savepoint = continue_from_save();
-		
+
 		if (continue_from_savepoint) {
 			state.load_state();
 			state.questions_filepath = state.questions_save_path;
 			state.clues_filepath = state.clues_save_path;
 		}
 	}
+	cls();
 
 	// get name
 	if (!continue_from_savepoint) {
+#ifdef TESTING
+#else
+		program_introduction();
+#endif
 		get_name(state.player_name);
 	}
 	cls();
