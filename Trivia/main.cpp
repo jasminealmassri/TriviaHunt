@@ -45,8 +45,8 @@ int main() {
 	// get name
 	if (!continue_from_savepoint) {
 		get_name(state.player_name);
-		cls();
 	}
+	cls();
 
 	// Parsing trivia questions
 	vector<MC> questions;

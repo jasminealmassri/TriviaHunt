@@ -152,8 +152,8 @@ void load_questions(std::vector<MC>& questions, std::string file_path) {
 
 void ask_questions(std::vector<MC>& questions, std::queue<Clue_t>& clues, GameState& state, std::string questions_savepoint_filepath, std::string clues_savepoint_filepath, std::string state_save_filepath) {
 
-	const int NUM_QUESTIONS = questions.size();
-	const int NUM_CLUES = clues.size();
+	//const int NUM_QUESTIONS = questions.size();
+	//const int NUM_CLUES = clues.size();
 	
 	//load_state(state_save_filepath, state);
 	//const int PTS_PER_Q = 10;
@@ -187,18 +187,16 @@ void ask_questions(std::vector<MC>& questions, std::queue<Clue_t>& clues, GameSt
 		if (answer == correct_answer) {
 
 			output_colour(ConsoleColours::BrightGreen);
-
 			std::cout << "\nCorrect!" << std::endl;
-
 			output_colour(ConsoleColours::White);
 
 			state.current_score += state.PTS_PER_Q;
 
 			questions.erase(std::find(questions.begin(), questions.end(), questions[0]));
 
-		
 			save_questions(questions_savepoint_filepath, questions);
-			
+
+			save_clues(clues_savepoint_filepath, clues);
 
 			if (state.current_score == state.next_clue_threshold) {
 
@@ -210,11 +208,11 @@ void ask_questions(std::vector<MC>& questions, std::queue<Clue_t>& clues, GameSt
 					break;
 				}
 
+				save_clues(clues_savepoint_filepath, clues);
 				state.clues_received++;
 				state.next_clue_threshold += state.CLUE_THRESHOLD;
-				save_clues(clues_savepoint_filepath, clues);
 			}
-
+		
 			save_state(state_save_filepath, state);
 			
 		}

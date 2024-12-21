@@ -11,6 +11,10 @@
 
 using Clue_t = std::string;
 
+/*
+*	class:		GameState
+*	purpose:	Represents game state
+*/
 struct GameState {
 	std::string player_name{};
 	int current_score{};
@@ -21,6 +25,7 @@ struct GameState {
 	int clues_received{};
 	int next_clue_threshold{ CLUE_THRESHOLD };
 };
+
 /*
 *	class:		MC
 *	purpose:	Represents a multiple choice question
