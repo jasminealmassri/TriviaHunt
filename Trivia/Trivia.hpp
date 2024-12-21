@@ -32,6 +32,7 @@ public:
 
 	std::string question() const { return question_;  }
 	unsigned correct_response() const { return correct_response_; }
+	char correct_response_char() const { return correct_response_ + 'A'; }
 	std::vector<std::string> options() const { return options_; }
 
 	void display();
@@ -313,15 +314,6 @@ inline void display_clue(Clue_t clue) {
 }
 
 
-/*
-\ fn:		void load_clues(std::queue<Clue_t>& clues, std::string file_path);
-\ brief:	Loads treasure hunt clues from given filepath
-\ param:	std::queue<Clue_t>& clues, std::string file_path
-*/
-//void load_clues(std::queue<Clue_t>& clues, std::string file_path);
-
-void ask_questions(GameState& state);
-
 inline void display_victory(std::string name) {
 	cls();
 	std::cout << "\n\n";
@@ -342,28 +334,72 @@ inline void display_victory(std::string name) {
 	output_colour(ConsoleColours::Black);
 }
 
-//void load_state(std::string state_save_filepath, GameState& state);
+
+inline int ask_question(MC question) {
+	
+	char answer;
+	question.display();
+
+	// get valid answer from user
+	do {
+		get_valid_input(std::cin, answer, "\nEnter your answer: ");
+		answer = toupper(answer);
+
+		if (question.invalid_answer(answer)) {
+			std::cout << "Invalid response. Please try again.\n";
+		}
+
+	} while (question.invalid_answer(answer));
+
+	return answer;
+}
 
 
+inline void handle_correct_response(MC current_question, GameState& state) {
 
-//inline void save_clues(std::string clues_savepoint_filepath, std::queue<Clue_t> const& clues) {
-//
-//	std::ofstream file(clues_savepoint_filepath);
-//
-//	if (!file.is_open()) {
-//		std::cout << "Error: Could not save clues to file.\n";
-//		return;
-//	}
-//
-//	file << "Clue\n";
-//	std::queue<Clue_t> clues_copy(clues);
-//	while (!clues_copy.empty()) {
-//
-//		file << clues_copy.front() << "\n";
-//		clues_copy.pop();
-//	}
-//}
+	output_colour(ConsoleColours::BrightGreen);
+	std::cout << "\nCorrect!" << std::endl;
+	output_colour(ConsoleColours::White);
 
+	state.current_score += state.PTS_PER_Q;
+
+	state.questions.erase(std::find(state.questions.begin(), state.questions.end(), current_question));
+
+	state.save_questions();
+	state.save_clues();
+
+	if (state.current_score == state.next_clue_threshold) {
+
+		display_clue(state.clues.front());
+		state.clues.pop();
+
+		state.save_clues();
+		state.clues_received++;
+		state.next_clue_threshold += state.CLUE_THRESHOLD;
+	}
+
+	state.save_state();
+}
+
+inline void handle_incorrect_response(GameState& state) {
+	
+	output_colour(ConsoleColours::BrightRed);
+
+	std::cout << "\nIncorrect!" << std::endl;
+
+	output_colour(ConsoleColours::White);
+
+	shuffle(state.questions);
+}
+
+/*
+\ fn:		void load_clues(std::queue<Clue_t>& clues, std::string file_path);
+\ brief:	Loads treasure hunt clues from given filepath
+\ param:	std::queue<Clue_t>& clues, std::string file_path
+*/
+//void load_clues(std::queue<Clue_t>& clues, std::string file_path);
+
+void ask_questions(GameState& state);
 
 
 

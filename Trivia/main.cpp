@@ -66,6 +66,8 @@ int main() {
 	// Process questions
 	ask_questions(state);
 
+	state.remove_save_files();
+
 	display_victory(state.player_name);
 	
 }

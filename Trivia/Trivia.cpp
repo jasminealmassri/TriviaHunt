@@ -91,73 +91,22 @@ MC get_question_from_csv(std::string& csv_line) {
 void ask_questions(GameState& state) {
 
 
-	while(!state.questions.empty()) {
+	while(!state.questions.empty() || !state.clues.empty()) {
 
 		display_score(state.current_score, state.max_score, state.clues_received, state.max_clues);
 		
-		char answer;
-		state.questions[0].display();
+		MC current_question = state.questions[0];
+
+		char answer = ask_question(current_question);
+
+		char correct_answer = current_question.correct_response_char();
 		
-		// get valid answer from user
-		do {
-			get_valid_input(std::cin, answer, "\nEnter your answer: ");
-			answer = toupper(answer);
-
-			if (state.questions[0].invalid_answer(answer)) {
-				std::cout << "Invalid response. Please try again.\n";
-			}
-
-		} while (state.questions[0].invalid_answer(answer));
-
-		int correct_answer = state.questions[0].correct_response() + 'A';
+		answer == correct_answer ? 
+			handle_correct_response(current_question, state)
+		:	handle_incorrect_response(state);
 		
-		if (answer == correct_answer) {
-
-			output_colour(ConsoleColours::BrightGreen);
-			std::cout << "\nCorrect!" << std::endl;
-			output_colour(ConsoleColours::White);
-
-			state.current_score += state.PTS_PER_Q;
-
-			state.questions.erase(std::find(state.questions.begin(), state.questions.end(), state.questions[0]));
-
-			state.save_questions();
-
-			state.save_clues();
-
-			if (state.current_score == state.next_clue_threshold) {
-
-				display_clue(state.clues.front());
-				state.clues.pop();
-				
-				// quit if all clues are received
-				if (state.clues.empty()) {
-					break;
-				}
-
-				state.save_clues();
-				state.clues_received++;
-				state.next_clue_threshold += state.CLUE_THRESHOLD;
-			}
-		
-			state.save_state();
-			
-		}
-		else {
-
-			output_colour(ConsoleColours::BrightRed);
-
-			std::cout << "\nIncorrect!" << std::endl;
-
-			output_colour(ConsoleColours::White);
-
-			shuffle(state.questions);
-		}
-
 		wait(1500);
 		cls();
 	}
-
-	state.remove_save_files();
 
 }
