@@ -24,14 +24,13 @@ void MC::display() {
 
 }
 
-
-
+ 
 /*
 \ fn:		void add_question_from_csv(std::istream& is, std::vector<MC>& questions)
-\ brief:	Add question from a csv formatted input
+\ brief:	Gets question from a csv formatted input
 \ param:	std::istream& is, std::vector<MC>& questions
 */
-MC add_question_from_csv(std::string& csv_line) {
+MC get_question_from_csv(std::string& csv_line) {
 
 	std::istringstream ss(csv_line);
 
@@ -67,38 +66,7 @@ MC add_question_from_csv(std::string& csv_line) {
 }
 
 
-void load_clues(std::queue<Clue_t>& clues, std::string file_path) {
-
-	std::ifstream file_stream;
-	file_stream.open(file_path);
-
-	// If file could not be opened, notify user and exit
-	if (!file_stream) {
-		std::cerr << "Error: could not open file path: \"" << file_path << "\".\n";
-		file_stream.close();
-		return;
-	}
-	std::string line;
-
-	//get header (get rid of header line)
-	getline(file_stream, line);
-	// iterate over file, adding each line as a patient to the queue
-	while (getline(file_stream, line)) {
-		clues.push(line);
-	}
-}
-
-/*
-\ fn:		void load_queue(PriorityQueue<Patient>& queue)
-\ brief:	Adds to the current patient queue by loading from a CSV file provided by user
-\ param:	PriorityQueue<Patient> const& queue
-*/
-//void load_questions(std::vector<MC>& questions, std::string file_path) {
-//
-//	// get filepath from user
-//	//std::string file_path;
-//	//std::cout << "Enter path to file: ";
-//	//getline(std::cin, file_path);
+//void load_clues(std::queue<Clue_t>& clues, std::string file_path) {
 //
 //	std::ifstream file_stream;
 //	file_stream.open(file_path);
@@ -115,12 +83,12 @@ void load_clues(std::queue<Clue_t>& clues, std::string file_path) {
 //	getline(file_stream, line);
 //	// iterate over file, adding each line as a patient to the queue
 //	while (getline(file_stream, line)) {
-//		questions.push_back(add_question_from_csv(line));
+//		clues.push(line);
 //	}
 //}
 
 
-void ask_questions(std::queue<Clue_t>& clues, GameState& state) {
+void ask_questions(GameState& state) {
 
 
 	while(!state.questions.empty()) {
@@ -155,19 +123,19 @@ void ask_questions(std::queue<Clue_t>& clues, GameState& state) {
 
 			state.save_questions();
 
-			save_clues(state.clues_save_path, clues);
+			state.save_clues();
 
 			if (state.current_score == state.next_clue_threshold) {
 
-				display_clue(clues.front());
-				clues.pop();
+				display_clue(state.clues.front());
+				state.clues.pop();
 				
 				// quit if all clues are received
-				if (clues.empty()) {
+				if (state.clues.empty()) {
 					break;
 				}
 
-				save_clues(state.clues_save_path, clues);
+				state.save_clues();
 				state.clues_received++;
 				state.next_clue_threshold += state.CLUE_THRESHOLD;
 			}

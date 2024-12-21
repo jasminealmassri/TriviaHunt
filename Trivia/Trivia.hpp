@@ -11,7 +11,6 @@
 
 using Clue_t = std::string;
 
-
 /*
 *	class:		MC
 *	purpose:	Represents a multiple choice trivia question
@@ -47,12 +46,10 @@ public:
 };
 
 /*
-\ fn:		MC add_question_from_csv(std::string& csv_line)
-\ brief:	Add question from a csv formatted string
-\ param:	std::string& csv_line
+*   fn:			MC add_question_from_csv(std::string& csv_line)
+*   purpose:	Add question from a csv formatted string
 */
-MC add_question_from_csv(std::string& csv_line);
-
+MC get_question_from_csv(std::string& csv_line);
 
 /*
 *	struct:		GameState
@@ -77,7 +74,7 @@ struct GameState {
 	std::string state_save_path{};
 
 	std::vector<MC> questions{};
-	std::queue<MC> clues{};
+	std::queue<Clue_t> clues{};
 
 	void save_state() const {
 
@@ -131,11 +128,7 @@ struct GameState {
 		get_valid_input(ss, clues_received, "", ',');
 		get_valid_input(ss, next_clue_threshold, "", ',');
 	}
-	void remove_save_files() {
-		std::filesystem::remove(questions_save_path);
-		std::filesystem::remove(clues_save_path);
-		std::filesystem::remove(state_save_path);
-	}
+	
 
 	void load_questions() {
 		std::ifstream file_stream;
@@ -153,7 +146,7 @@ struct GameState {
 		getline(file_stream, line);
 		// iterate over file, adding each line as a patient to the queue
 		while (getline(file_stream, line)) {
-			questions.push_back(add_question_from_csv(line));
+			questions.push_back(get_question_from_csv(line));
 		}
 	}
 	void save_questions() {
@@ -182,6 +175,49 @@ struct GameState {
 			file << "\n";
 		}
 	}
+
+	void load_clues() {
+		std::ifstream file_stream;
+		file_stream.open(clues_filepath);
+
+		// If file could not be opened, notify user and exit
+		if (!file_stream) {
+			std::cerr << "Error: could not open file path: \"" << clues_filepath << "\".\n";
+			file_stream.close();
+			return;
+		}
+		std::string line;
+
+		//get header (get rid of header line)
+		getline(file_stream, line);
+		// iterate over file, adding each line as a patient to the queue
+		while (getline(file_stream, line)) {
+			clues.push(line);
+		}
+	}
+	void save_clues() {
+
+		std::ofstream file(clues_save_path);
+
+		if (!file.is_open()) {
+			std::cout << "Error: Could not save clues to file.\n";
+			return;
+		}
+
+		file << "Clue\n";
+		std::queue<Clue_t> clues_copy(clues);
+		while (!clues_copy.empty()) {
+
+			file << clues_copy.front() << "\n";
+			clues_copy.pop();
+		}
+	}
+	
+	void remove_save_files() {
+		std::filesystem::remove(questions_save_path);
+		std::filesystem::remove(clues_save_path);
+		std::filesystem::remove(state_save_path);
+	}
 };
 
 inline bool continue_from_save() {
@@ -195,8 +231,6 @@ inline bool continue_from_save() {
 
 	return answer == 'Y';
 }
-
-
 
 inline void display_header() {
 	output_colour(ConsoleColours::Yellow);
@@ -279,15 +313,14 @@ inline void display_clue(Clue_t clue) {
 }
 
 
-
 /*
 \ fn:		void load_clues(std::queue<Clue_t>& clues, std::string file_path);
 \ brief:	Loads treasure hunt clues from given filepath
 \ param:	std::queue<Clue_t>& clues, std::string file_path
 */
-void load_clues(std::queue<Clue_t>& clues, std::string file_path);
+//void load_clues(std::queue<Clue_t>& clues, std::string file_path);
 
-void ask_questions(std::queue<Clue_t>& clues, GameState& state);
+void ask_questions(GameState& state);
 
 inline void display_victory(std::string name) {
 	cls();
@@ -313,23 +346,23 @@ inline void display_victory(std::string name) {
 
 
 
-inline void save_clues(std::string clues_savepoint_filepath, std::queue<Clue_t> const& clues) {
-
-	std::ofstream file(clues_savepoint_filepath);
-
-	if (!file.is_open()) {
-		std::cout << "Error: Could not save clues to file.\n";
-		return;
-	}
-
-	file << "Clue\n";
-	std::queue<Clue_t> clues_copy(clues);
-	while (!clues_copy.empty()) {
-
-		file << clues_copy.front() << "\n";
-		clues_copy.pop();
-	}
-}
+//inline void save_clues(std::string clues_savepoint_filepath, std::queue<Clue_t> const& clues) {
+//
+//	std::ofstream file(clues_savepoint_filepath);
+//
+//	if (!file.is_open()) {
+//		std::cout << "Error: Could not save clues to file.\n";
+//		return;
+//	}
+//
+//	file << "Clue\n";
+//	std::queue<Clue_t> clues_copy(clues);
+//	while (!clues_copy.empty()) {
+//
+//		file << clues_copy.front() << "\n";
+//		clues_copy.pop();
+//	}
+//}
 
 
 

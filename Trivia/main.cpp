@@ -17,14 +17,14 @@ int main() {
 	GameState state{};
 
 	//const string questions_original_filepath("../Trivia.csv");
-	const string clues_original_filepath("../Clues.csv");
+	state.clues_filepath = "../Clues.csv";
 	state.questions_filepath = "../Trivia.csv";
 	state.questions_save_path = "../QuestionsSave.csv";
 	state.clues_save_path = "../CluesSave.csv";
 	state.state_save_path = "../StateSave.csv";
 
 	//string questions_filepath{ questions_original_filepath};
-	string clues_filepath{ clues_original_filepath };
+	//string clues_filepath{ clues_original_filepath };
 
 	bool continue_from_savepoint{};
 
@@ -40,7 +40,7 @@ int main() {
 		if (continue_from_savepoint) {
 			state.load_state();
 			state.questions_filepath = state.questions_save_path;
-			clues_filepath = state.clues_save_path;
+			state.clues_filepath = state.clues_save_path;
 		}
 	}
 
@@ -56,15 +56,15 @@ int main() {
 	shuffle(state.questions);
 
 	// Parsing clues
-	queue<string> clues;
-	load_clues(clues, clues_filepath);
+	//queue<string> clues;
+	state.load_clues();
 	
 	if (!continue_from_savepoint) {
 		state.max_score = state.questions.size() * state.PTS_PER_Q;
-		state.max_clues = clues.size();
+		state.max_clues = state.clues.size();
 	}
 	// Process questions
-	ask_questions(clues, state);
+	ask_questions(state);
 
 	display_victory(state.player_name);
 	
