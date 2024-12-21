@@ -31,7 +31,8 @@ Tools: Visual Studio 2022
 
 ### <ins>Learning outcomes:</ins>
 
-- Best learning experience on this project was learning to make persistance state from scratch. It was a good thought exercise on saving and loading state at its most basic form.
-- I made code readability a priority by abstracting code into named functions and replacing all magic numbers with enums and variables.
-- I focused on separation of concerns in each file, class and method.
-- I made several new utility functions for CSV parsing, changing console font colour and printing text at various speeds
+- CSV File I/O, managing state, handling user input
+- Best learning experience during this project was learning to make persistance state from scratch. It was a good thought exercise on saving and loading state at its most basic form.
+- I made code readability a priority by abstracting code into named functions and replacing all magic numbers with enums and variables
+- I focused on separation of concerns in each file, class and method
+- I made several reusable utility functions for CSV parsing, changing console font colour and printing text at various speeds
